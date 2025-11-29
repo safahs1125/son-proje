@@ -308,15 +308,58 @@ async def init_topics(student_id: str, bolum: str):
         response = supabase.table("topics").insert(data).execute()
         topics.extend(response.data)
     
-    # AYT Topics based on bolum
+    # AYT Topics based on bolum - GÜNCEL MÜFREDAT
     if bolum == "Sayısal":
         ayt_topics = [
-            {"ders": "Matematik AYT", "konu": "Limit"},
+            # Matematik (40 soru)
+            {"ders": "Matematik AYT", "konu": "Trigonometri"},
+            {"ders": "Matematik AYT", "konu": "Fonksiyonlar"},
+            {"ders": "Matematik AYT", "konu": "Polinomlar"},
+            {"ders": "Matematik AYT", "konu": "Logaritma"},
+            {"ders": "Matematik AYT", "konu": "Diziler"},
+            {"ders": "Matematik AYT", "konu": "Limit ve Süreklilik"},
             {"ders": "Matematik AYT", "konu": "Türev"},
-            {"ders": "Fizik AYT", "konu": "Elektrik"},
-            {"ders": "Fizik AYT", "konu": "Manyetizma"},
-            {"ders": "Kimya AYT", "konu": "Kimyasal Tepkimeler"},
+            {"ders": "Matematik AYT", "konu": "İntegral"},
+            {"ders": "Matematik AYT", "konu": "Olasılık"},
+            {"ders": "Matematik AYT", "konu": "Karmaşık Sayılar"},
+            {"ders": "Matematik AYT", "konu": "Parabol"},
+            {"ders": "Matematik AYT", "konu": "Çember ve Daire"},
+            {"ders": "Matematik AYT", "konu": "Katı Cisimler"},
+            
+            # Fizik (14 soru)
+            {"ders": "Fizik AYT", "konu": "Elektrik ve Manyetizma"},
+            {"ders": "Fizik AYT", "konu": "Elektrik Akımı"},
+            {"ders": "Fizik AYT", "konu": "Manyetik Alan"},
+            {"ders": "Fizik AYT", "konu": "Elektromanyetik İndüksiyon"},
+            {"ders": "Fizik AYT", "konu": "Alternatif Akım"},
+            {"ders": "Fizik AYT", "konu": "Atom Fiziği"},
+            {"ders": "Fizik AYT", "konu": "Modern Fizik"},
+            {"ders": "Fizik AYT", "konu": "Optik"},
+            {"ders": "Fizik AYT", "konu": "Dalgalar"},
+            {"ders": "Fizik AYT", "konu": "Kuvvet ve Hareket"},
+            
+            # Kimya (13 soru)
+            {"ders": "Kimya AYT", "konu": "Kimyasal Tepkimelerde Enerji"},
+            {"ders": "Kimya AYT", "konu": "Kimyasal Tepkimelerde Hız"},
+            {"ders": "Kimya AYT", "konu": "Kimyasal Tepkimelerde Denge"},
+            {"ders": "Kimya AYT", "konu": "Asit Baz Dengesi"},
+            {"ders": "Kimya AYT", "konu": "Çözünürlük Dengesi"},
+            {"ders": "Kimya AYT", "konu": "Elektrokimya"},
+            {"ders": "Kimya AYT", "konu": "Karbon Kimyasına Giriş"},
+            {"ders": "Kimya AYT", "konu": "Organik Bileşikler"},
+            {"ders": "Kimya AYT", "konu": "Enerji Kaynakları"},
+            
+            # Biyoloji (13 soru)
+            {"ders": "Biyoloji AYT", "konu": "Canlılarda Enerji Dönüşümleri"},
+            {"ders": "Biyoloji AYT", "konu": "Fotosentez"},
+            {"ders": "Biyoloji AYT", "konu": "Solunum"},
+            {"ders": "Biyoloji AYT", "konu": "Bitki Biyolojisi"},
             {"ders": "Biyoloji AYT", "konu": "Kalıtım"},
+            {"ders": "Biyoloji AYT", "konu": "Genetik Şifre"},
+            {"ders": "Biyoloji AYT", "konu": "Canlıların Sınıflandırılması"},
+            {"ders": "Biyoloji AYT", "konu": "Ekosistem Ekolojisi"},
+            {"ders": "Biyoloji AYT", "konu": "Popülasyon Ekolojisi"},
+            {"ders": "Biyoloji AYT", "konu": "Evrim"},
         ]
         for idx, topic in enumerate(ayt_topics):
             data = {
