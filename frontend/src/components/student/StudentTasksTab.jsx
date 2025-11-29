@@ -171,13 +171,13 @@ export default function StudentTasksTab({ studentId, onRefresh }) {
               Yeni Görev
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Yeni Görev Ekle</DialogTitle>
+              <DialogTitle>Toplu Görev Ekle (10'a kadar)</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Gün</label>
+                <label className="block text-sm font-medium mb-2">Gün Seçin</label>
                 <select
                   value={selectedDay}
                   onChange={(e) => setSelectedDay(e.target.value)}
@@ -189,27 +189,35 @@ export default function StudentTasksTab({ studentId, onRefresh }) {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Görev Açıklaması</label>
-                <Input
-                  value={newTask.aciklama}
-                  onChange={(e) => setNewTask({ ...newTask, aciklama: e.target.value })}
-                  placeholder="Ör: Matematik limit çalış"
-                  data-testid="student-task-description-input"
-                />
+              
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600">Görevleri girin (boş bırakılanlar eklenmeyecek):</p>
+                {newTasks.map((task, index) => (
+                  <Card key={index} className="p-3 bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-gray-500 min-w-[30px]">{index + 1}.</span>
+                      <Input
+                        value={task.aciklama}
+                        onChange={(e) => updateTaskField(index, 'aciklama', e.target.value)}
+                        placeholder={`Görev ${index + 1} açıklaması`}
+                        className="flex-1"
+                        data-testid={`student-task-description-${index}`}
+                      />
+                      <Input
+                        type="number"
+                        value={task.sure || ''}
+                        onChange={(e) => updateTaskField(index, 'sure', e.target.value)}
+                        placeholder="dk"
+                        className="w-20"
+                        data-testid={`student-task-duration-${index}`}
+                      />
+                    </div>
+                  </Card>
+                ))}
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Süre (dakika)</label>
-                <Input
-                  type="number"
-                  value={newTask.sure}
-                  onChange={(e) => setNewTask({ ...newTask, sure: e.target.value })}
-                  placeholder="60"
-                  data-testid="student-task-duration-input"
-                />
-              </div>
-              <Button onClick={handleAddTask} className="w-full" data-testid="student-create-task-button">
-                Görev Ekle
+              
+              <Button onClick={handleAddTasks} className="w-full" data-testid="student-create-tasks-button">
+                Görevleri Ekle
               </Button>
             </div>
           </DialogContent>
