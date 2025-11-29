@@ -10,6 +10,7 @@ import uuid
 from datetime import datetime, timezone
 import bcrypt
 from supabase import create_client, Client
+from tyt_ayt_topics import TYT_TOPICS, AYT_SAYISAL, AYT_ESIT_AGIRLIK, AYT_SOZEL
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
