@@ -425,12 +425,65 @@ async def init_topics(student_id: str, bolum: str):
     
     elif bolum == "Sözel":
         ayt_topics = [
+            # Edebiyat (24 soru)
+            {"ders": "Edebiyat", "konu": "Türk Edebiyatının Dönemleri"},
+            {"ders": "Edebiyat", "konu": "İslamiyet Öncesi Türk Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "İslamiyet Sonrası Türk Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Divan Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Halk Edebiyatı"},
             {"ders": "Edebiyat", "konu": "Tanzimat Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Servetifünun"},
-            {"ders": "Tarih", "konu": "Osmanlı Tarihi"},
-            {"ders": "Tarih", "konu": "Türkiye Cumhuriyeti"},
-            {"ders": "Coğrafya", "konu": "Türkiye Coğrafyası"},
+            {"ders": "Edebiyat", "konu": "Servetifünun Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Fecri Ati Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Milli Edebiyat"},
+            {"ders": "Edebiyat", "konu": "Cumhuriyet Dönemi Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Şiir İncelemesi"},
+            {"ders": "Edebiyat", "konu": "Hikaye ve Roman"},
+            {"ders": "Edebiyat", "konu": "Tiyatro"},
+            
+            # Tarih-1 (10 soru)
+            {"ders": "Tarih-1", "konu": "Osmanlı Tarihi"},
+            {"ders": "Tarih-1", "konu": "Osmanlı Kültür ve Medeniyeti"},
+            {"ders": "Tarih-1", "konu": "Osmanlı Devleti'nin Dağılma Süreci"},
+            {"ders": "Tarih-1", "konu": "XIX. Yüzyılda Osmanlı"},
+            {"ders": "Tarih-1", "konu": "Milli Mücadele"},
+            
+            # Coğrafya-1 (6 soru)
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Coğrafi Konumu"},
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Fiziki Coğrafyası"},
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Beşeri Coğrafyası"},
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin İklimi"},
+            
+            # Tarih-2 (11 soru)
+            {"ders": "Tarih-2", "konu": "Atatürk İlkeleri"},
+            {"ders": "Tarih-2", "konu": "Türkiye Cumhuriyeti Tarihi"},
+            {"ders": "Tarih-2", "konu": "İnkılap Tarihi"},
+            {"ders": "Tarih-2", "konu": "Çağdaş Türk ve Dünya Tarihi"},
+            {"ders": "Tarih-2", "konu": "Savaşlar Arası Dönem"},
+            {"ders": "Tarih-2", "konu": "İkinci Dünya Savaşı"},
+            {"ders": "Tarih-2", "konu": "Soğuk Savaş Dönemi"},
+            
+            # Coğrafya-2 (11 soru)
+            {"ders": "Coğrafya-2", "konu": "Çevre ve Toplum"},
+            {"ders": "Coğrafya-2", "konu": "Doğal Sistemler"},
+            {"ders": "Coğrafya-2", "konu": "Ülkeler Coğrafyası"},
+            {"ders": "Coğrafya-2", "konu": "Küresel Ortam"},
+            {"ders": "Coğrafya-2", "konu": "Bölgeler Coğrafyası"},
+            
+            # Felsefe (12 soru)
+            {"ders": "Felsefe", "konu": "Felsefeye Giriş"},
             {"ders": "Felsefe", "konu": "Bilgi Felsefesi"},
+            {"ders": "Felsefe", "konu": "Bilim Felsefesi"},
+            {"ders": "Felsefe", "konu": "Ahlak Felsefesi"},
+            {"ders": "Felsefe", "konu": "Sanat Felsefesi"},
+            {"ders": "Felsefe", "konu": "Din Felsefesi"},
+            {"ders": "Felsefe", "konu": "Siyaset Felsefesi"},
+            {"ders": "Felsefe", "konu": "Mantık"},
+            
+            # Din Kültürü (6 soru)
+            {"ders": "Din", "konu": "İslam Düşüncesi"},
+            {"ders": "Din", "konu": "Din Psikolojisi"},
+            {"ders": "Din", "konu": "Din Sosyolojisi"},
+            {"ders": "Din", "konu": "İslam ve Bilim"},
         ]
         for idx, topic in enumerate(ayt_topics):
             data = {
