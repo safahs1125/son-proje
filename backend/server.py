@@ -375,11 +375,41 @@ async def init_topics(student_id: str, bolum: str):
     
     elif bolum == "Eşit Ağırlık":
         ayt_topics = [
-            {"ders": "Matematik AYT", "konu": "Limit"},
+            # Matematik (40 soru)
+            {"ders": "Matematik AYT", "konu": "Trigonometri"},
+            {"ders": "Matematik AYT", "konu": "Fonksiyonlar"},
+            {"ders": "Matematik AYT", "konu": "Polinomlar"},
+            {"ders": "Matematik AYT", "konu": "Logaritma"},
+            {"ders": "Matematik AYT", "konu": "Diziler"},
+            {"ders": "Matematik AYT", "konu": "Limit ve Süreklilik"},
             {"ders": "Matematik AYT", "konu": "Türev"},
+            {"ders": "Matematik AYT", "konu": "İntegral"},
+            
+            # Edebiyat (24 soru)
+            {"ders": "Edebiyat", "konu": "Türk Edebiyatının Dönemleri"},
             {"ders": "Edebiyat", "konu": "Tanzimat Edebiyatı"},
-            {"ders": "Tarih", "konu": "Osmanlı Tarihi"},
-            {"ders": "Coğrafya", "konu": "Türkiye Coğrafyası"},
+            {"ders": "Edebiyat", "konu": "Servetifünun Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Fecri Ati Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Milli Edebiyat"},
+            {"ders": "Edebiyat", "konu": "Cumhuriyet Dönemi Edebiyatı"},
+            {"ders": "Edebiyat", "konu": "Şiir İncelemesi"},
+            {"ders": "Edebiyat", "konu": "Hikaye ve Roman"},
+            {"ders": "Edebiyat", "konu": "Tiyatro"},
+            {"ders": "Edebiyat", "konu": "Deneme"},
+            
+            # Tarih-1 (10 soru)
+            {"ders": "Tarih-1", "konu": "Osmanlı Tarihi"},
+            {"ders": "Tarih-1", "konu": "Osmanlı Kültür ve Medeniyeti"},
+            {"ders": "Tarih-1", "konu": "Osmanlı Devleti'nin Dağılma Süreci"},
+            {"ders": "Tarih-1", "konu": "XIX. Yüzyılda Osmanlı"},
+            {"ders": "Tarih-1", "konu": "Milli Mücadele"},
+            
+            # Coğrafya-1 (6 soru)
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Coğrafi Konumu"},
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Fiziki Coğrafyası"},
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Beşeri Coğrafyası"},
+            {"ders": "Coğrafya-1", "konu": "Türkiye'nin İklimi"},
+            {"ders": "Coğrafya-1", "konu": "Bölgeler Coğrafyası"},
         ]
         for idx, topic in enumerate(ayt_topics):
             data = {
