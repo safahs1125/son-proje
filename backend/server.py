@@ -38,21 +38,12 @@ class StudentCreate(BaseModel):
     hedef: Optional[str] = None
     notlar: Optional[str] = None
 
-class StudentResponse(BaseModel):
-    id: str
-    ad: str
-    soyad: Optional[str] = None
-    bolum: str
-    hedef: Optional[str] = None
-    notlar: Optional[str] = None
-    token: str
-    created_at: str
-
 class TopicCreate(BaseModel):
     student_id: str
     ders: str
     konu: str
     durum: str = "baslanmadi"
+    sinav_turu: str = "TYT"
     order_index: int = 0
 
 class TopicUpdate(BaseModel):
@@ -95,7 +86,6 @@ class CalendarNoteUpdate(BaseModel):
 # Coach Authentication
 @api_router.post("/coach/login", response_model=CoachLoginResponse)
 async def coach_login(login: CoachLogin):
-    # Simple password check (in production, use proper password hash)
     if login.password == "coach2025":
         return CoachLoginResponse(success=True, token="coach-token-12345")
     raise HTTPException(status_code=401, detail="Şifre hatalı")
@@ -106,7 +96,7 @@ async def get_students():
     response = supabase.table("students").select("*").execute()
     return response.data
 
-@api_router.post("/students", response_model=dict)
+@api_router.post("/students")
 async def create_student(student: StudentCreate):
     student_token = str(uuid.uuid4())
     data = {
@@ -150,12 +140,10 @@ async def update_student(student_id: str, student: StudentCreate):
 
 @api_router.delete("/students/{student_id}")
 async def delete_student(student_id: str):
-    # Delete related data first
     supabase.table("topics").delete().eq("student_id", student_id).execute()
     supabase.table("tasks").delete().eq("student_id", student_id).execute()
     supabase.table("exams").delete().eq("student_id", student_id).execute()
     supabase.table("calendar_notes").delete().eq("student_id", student_id).execute()
-    
     response = supabase.table("students").delete().eq("id", student_id).execute()
     return {"success": True}
 
@@ -173,6 +161,7 @@ async def create_topic(topic: TopicCreate):
         "ders": topic.ders,
         "konu": topic.konu,
         "durum": topic.durum,
+        "sinav_turu": topic.sinav_turu,
         "order_index": topic.order_index
     }
     response = supabase.table("topics").insert(data).execute()
@@ -191,10 +180,10 @@ async def delete_topic(topic_id: str):
 
 @api_router.post("/topics/init/{student_id}")
 async def init_topics(student_id: str, bolum: str):
-    """Initialize default TYT and AYT topics for a student"""
+    """Initialize TYT and AYT topics for a student"""
     topics = []
     
-    # Normalize bolum name
+    # Normalize bolum
     bolum_normalized = bolum.strip().lower()
     if 'sayisal' in bolum_normalized or 'sayısal' in bolum_normalized:
         bolum = "Sayısal"
@@ -205,7 +194,7 @@ async def init_topics(student_id: str, bolum: str):
     
     order_index = 0
     
-    # Add TYT Topics for all students
+    # Add TYT Topics
     for ders_name, konu_list in TYT_TOPICS.items():
         for konu in konu_list:
             data = {
@@ -214,316 +203,35 @@ async def init_topics(student_id: str, bolum: str):
                 "ders": f"TYT - {ders_name}",
                 "konu": konu,
                 "durum": "baslanmadi",
-                "order_index": order_index,
-                "sinav_turu": "TYT"
+                "sinav_turu": "TYT",
+                "order_index": order_index
             }
             response = supabase.table("topics").insert(data).execute()
             topics.extend(response.data)
             order_index += 1
     
-    # Add AYT Topics based on bolum
+    # Add AYT Topics
     ayt_topics_dict = {
-        # Türkçe (40 soru)
-        {"ders": "Türkçe", "konu": "Ses Bilgisi"},
-        {"ders": "Türkçe", "konu": "Yazım Kuralları"},
-        {"ders": "Türkçe", "konu": "Noktalama İşaretleri"},
-        {"ders": "Türkçe", "konu": "Sözcükte Anlam"},
-        {"ders": "Türkçe", "konu": "Cümlede Anlam"},
-        {"ders": "Türkçe", "konu": "Paragraf"},
-        {"ders": "Türkçe", "konu": "Anlatım Biçimleri"},
-        {"ders": "Türkçe", "konu": "Fiilimsiler"},
-        {"ders": "Türkçe", "konu": "Cümle Çeşitleri"},
-        
-        # Matematik (40 soru)
-        {"ders": "Matematik", "konu": "Temel Kavramlar"},
-        {"ders": "Matematik", "konu": "Sayılar"},
-        {"ders": "Matematik", "konu": "Rasyonel Sayılar"},
-        {"ders": "Matematik", "konu": "Üslü Sayılar"},
-        {"ders": "Matematik", "konu": "Köklü Sayılar"},
-        {"ders": "Matematik", "konu": "Çarpanlara Ayırma"},
-        {"ders": "Matematik", "konu": "Denklemler"},
-        {"ders": "Matematik", "konu": "Eşitsizlikler"},
-        {"ders": "Matematik", "konu": "Mutlak Değer"},
-        {"ders": "Matematik", "konu": "Üslü ve Köklü Sayılar"},
-        {"ders": "Matematik", "konu": "Oran-Orantı"},
-        {"ders": "Matematik", "konu": "Dört İşlem"},
-        {"ders": "Matematik", "konu": "Kümeler"},
-        {"ders": "Matematik", "konu": "Fonksiyonlar"},
-        {"ders": "Matematik", "konu": "İkinci Dereceden Denklemler"},
-        {"ders": "Matematik", "konu": "Permütasyon"},
-        {"ders": "Matematik", "konu": "Kombinasyon"},
-        {"ders": "Matematik", "konu": "Olasılık"},
-        {"ders": "Matematik", "konu": "Geometri - Temel Kavramlar"},
-        {"ders": "Matematik", "konu": "Üçgenler"},
-        {"ders": "Matematik", "konu": "Çember"},
-        {"ders": "Matematik", "konu": "Analitik Geometri"},
-        
-        # Sosyal Bilimler (20 soru - Tarih 5, Coğrafya 5, Felsefe 5, Din 5)
-        {"ders": "Tarih", "konu": "İslam Öncesi Türk Tarihi"},
-        {"ders": "Tarih", "konu": "İlk Türk İslam Devletleri"},
-        {"ders": "Tarih", "konu": "Türkiye Selçukluları"},
-        {"ders": "Tarih", "konu": "Osmanlı Kuruluş Dönemi"},
-        {"ders": "Tarih", "konu": "Osmanlı Yükselme Dönemi"},
-        {"ders": "Tarih", "konu": "Osmanlı Duraklama ve Gerileme"},
-        {"ders": "Tarih", "konu": "Osmanlı Yenileşme Hareketleri"},
-        {"ders": "Tarih", "konu": "Osmanlı Dağılma Dönemi"},
-        {"ders": "Tarih", "konu": "Milli Mücadele"},
-        {"ders": "Tarih", "konu": "Atatürk İlkeleri"},
-        
-        {"ders": "Coğrafya", "konu": "Doğa ve İnsan"},
-        {"ders": "Coğrafya", "konu": "Harita Bilgisi"},
-        {"ders": "Coğrafya", "konu": "Dünya'nın Şekli"},
-        {"ders": "Coğrafya", "konu": "İklim"},
-        {"ders": "Coğrafya", "konu": "Nüfus"},
-        {"ders": "Coğrafya", "konu": "Yerşekilleri"},
-        {"ders": "Coğrafya", "konu": "Türkiye'nin Coğrafi Konumu"},
-        {"ders": "Coğrafya", "konu": "Türkiye'nin İklimi"},
-        {"ders": "Coğrafya", "konu": "Doğal Afetler"},
-        
-        {"ders": "Felsefe", "konu": "Felsefe ve Mitoloji"},
-        {"ders": "Felsefe", "konu": "Bilgi Felsefesi"},
-        {"ders": "Felsefe", "konu": "Bilim Felsefesi"},
-        {"ders": "Felsefe", "konu": "Ahlak Felsefesi"},
-        {"ders": "Felsefe", "konu": "Sanat Felsefesi"},
-        {"ders": "Felsefe", "konu": "Din Felsefesi"},
-        {"ders": "Felsefe", "konu": "Siyaset Felsefesi"},
-        
-        {"ders": "Din", "konu": "İslam'ın Şartları"},
-        {"ders": "Din", "konu": "İbadet"},
-        {"ders": "Din", "konu": "Hz. Muhammed'in Hayatı"},
-        {"ders": "Din", "konu": "Kur'an"},
-        {"ders": "Din", "konu": "Ahlak"},
-        
-        # Fen Bilimleri (20 soru - Fizik 7, Kimya 7, Biyoloji 6)
-        {"ders": "Fizik", "konu": "Fizik Bilimine Giriş"},
-        {"ders": "Fizik", "konu": "Madde ve Özellikleri"},
-        {"ders": "Fizik", "konu": "Hareket"},
-        {"ders": "Fizik", "konu": "Kuvvet ve Hareket"},
-        {"ders": "Fizik", "konu": "Enerji"},
-        {"ders": "Fizik", "konu": "İş - Güç - Enerji"},
-        {"ders": "Fizik", "konu": "Isı ve Sıcaklık"},
-        {"ders": "Fizik", "konu": "Elektrostatik"},
-        {"ders": "Fizik", "konu": "Dalgalar"},
-        
-        {"ders": "Kimya", "konu": "Kimyanın Temel Kanunları"},
-        {"ders": "Kimya", "konu": "Atom ve Periyodik Sistem"},
-        {"ders": "Kimya", "konu": "Kimyasal Türler"},
-        {"ders": "Kimya", "konu": "Kimyasal Tepkimeler"},
-        {"ders": "Kimya", "konu": "Maddenin Halleri"},
-        {"ders": "Kimya", "konu": "Çözeltiler"},
-        {"ders": "Kimya", "konu": "Asitler ve Bazlar"},
-        {"ders": "Kimya", "konu": "Kimyasal Hesaplamalar"},
-        
-        {"ders": "Biyoloji", "konu": "Hücre"},
-        {"ders": "Biyoloji", "konu": "Hücre Bölünmeleri"},
-        {"ders": "Biyoloji", "konu": "Mitoz"},
-        {"ders": "Biyoloji", "konu": "Mayoz"},
-        {"ders": "Biyoloji", "konu": "Canlılarda Enerji"},
-        {"ders": "Biyoloji", "konu": "Sinir Sistemi"},
-        {"ders": "Biyoloji", "konu": "Duyu Organları"},
-        {"ders": "Biyoloji", "konu": "Bitki Biyolojisi"},
-    ]
+        "Sayısal": AYT_SAYISAL,
+        "Eşit Ağırlık": AYT_ESIT_AGIRLIK,
+        "Sözel": AYT_SOZEL
+    }
     
-    for idx, topic in enumerate(tyt_topics):
-        data = {
-            "id": str(uuid.uuid4()),
-            "student_id": student_id,
-            "ders": topic["ders"],
-            "konu": topic["konu"],
-            "durum": "baslanmadi",
-            "order_index": idx
-        }
-        response = supabase.table("topics").insert(data).execute()
-        topics.extend(response.data)
-    
-    # AYT Topics based on bolum - GÜNCEL MÜFREDAT
-    if bolum == "Sayısal":
-        ayt_topics = [
-            # Matematik (40 soru)
-            {"ders": "Matematik AYT", "konu": "Trigonometri"},
-            {"ders": "Matematik AYT", "konu": "Fonksiyonlar"},
-            {"ders": "Matematik AYT", "konu": "Polinomlar"},
-            {"ders": "Matematik AYT", "konu": "Logaritma"},
-            {"ders": "Matematik AYT", "konu": "Diziler"},
-            {"ders": "Matematik AYT", "konu": "Limit ve Süreklilik"},
-            {"ders": "Matematik AYT", "konu": "Türev"},
-            {"ders": "Matematik AYT", "konu": "İntegral"},
-            {"ders": "Matematik AYT", "konu": "Olasılık"},
-            {"ders": "Matematik AYT", "konu": "Karmaşık Sayılar"},
-            {"ders": "Matematik AYT", "konu": "Parabol"},
-            {"ders": "Matematik AYT", "konu": "Çember ve Daire"},
-            {"ders": "Matematik AYT", "konu": "Katı Cisimler"},
-            
-            # Fizik (14 soru)
-            {"ders": "Fizik AYT", "konu": "Elektrik ve Manyetizma"},
-            {"ders": "Fizik AYT", "konu": "Elektrik Akımı"},
-            {"ders": "Fizik AYT", "konu": "Manyetik Alan"},
-            {"ders": "Fizik AYT", "konu": "Elektromanyetik İndüksiyon"},
-            {"ders": "Fizik AYT", "konu": "Alternatif Akım"},
-            {"ders": "Fizik AYT", "konu": "Atom Fiziği"},
-            {"ders": "Fizik AYT", "konu": "Modern Fizik"},
-            {"ders": "Fizik AYT", "konu": "Optik"},
-            {"ders": "Fizik AYT", "konu": "Dalgalar"},
-            {"ders": "Fizik AYT", "konu": "Kuvvet ve Hareket"},
-            
-            # Kimya (13 soru)
-            {"ders": "Kimya AYT", "konu": "Kimyasal Tepkimelerde Enerji"},
-            {"ders": "Kimya AYT", "konu": "Kimyasal Tepkimelerde Hız"},
-            {"ders": "Kimya AYT", "konu": "Kimyasal Tepkimelerde Denge"},
-            {"ders": "Kimya AYT", "konu": "Asit Baz Dengesi"},
-            {"ders": "Kimya AYT", "konu": "Çözünürlük Dengesi"},
-            {"ders": "Kimya AYT", "konu": "Elektrokimya"},
-            {"ders": "Kimya AYT", "konu": "Karbon Kimyasına Giriş"},
-            {"ders": "Kimya AYT", "konu": "Organik Bileşikler"},
-            {"ders": "Kimya AYT", "konu": "Enerji Kaynakları"},
-            
-            # Biyoloji (13 soru)
-            {"ders": "Biyoloji AYT", "konu": "Canlılarda Enerji Dönüşümleri"},
-            {"ders": "Biyoloji AYT", "konu": "Fotosentez"},
-            {"ders": "Biyoloji AYT", "konu": "Solunum"},
-            {"ders": "Biyoloji AYT", "konu": "Bitki Biyolojisi"},
-            {"ders": "Biyoloji AYT", "konu": "Kalıtım"},
-            {"ders": "Biyoloji AYT", "konu": "Genetik Şifre"},
-            {"ders": "Biyoloji AYT", "konu": "Canlıların Sınıflandırılması"},
-            {"ders": "Biyoloji AYT", "konu": "Ekosistem Ekolojisi"},
-            {"ders": "Biyoloji AYT", "konu": "Popülasyon Ekolojisi"},
-            {"ders": "Biyoloji AYT", "konu": "Evrim"},
-        ]
-        for idx, topic in enumerate(ayt_topics):
-            data = {
-                "id": str(uuid.uuid4()),
-                "student_id": student_id,
-                "ders": topic["ders"],
-                "konu": topic["konu"],
-                "durum": "baslanmadi",
-                "order_index": len(tyt_topics) + idx
-            }
-            response = supabase.table("topics").insert(data).execute()
-            topics.extend(response.data)
-    
-    elif bolum == "Eşit Ağırlık":
-        ayt_topics = [
-            # Matematik (40 soru)
-            {"ders": "Matematik AYT", "konu": "Trigonometri"},
-            {"ders": "Matematik AYT", "konu": "Fonksiyonlar"},
-            {"ders": "Matematik AYT", "konu": "Polinomlar"},
-            {"ders": "Matematik AYT", "konu": "Logaritma"},
-            {"ders": "Matematik AYT", "konu": "Diziler"},
-            {"ders": "Matematik AYT", "konu": "Limit ve Süreklilik"},
-            {"ders": "Matematik AYT", "konu": "Türev"},
-            {"ders": "Matematik AYT", "konu": "İntegral"},
-            
-            # Edebiyat (24 soru)
-            {"ders": "Edebiyat", "konu": "Türk Edebiyatının Dönemleri"},
-            {"ders": "Edebiyat", "konu": "Tanzimat Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Servetifünun Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Fecri Ati Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Milli Edebiyat"},
-            {"ders": "Edebiyat", "konu": "Cumhuriyet Dönemi Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Şiir İncelemesi"},
-            {"ders": "Edebiyat", "konu": "Hikaye ve Roman"},
-            {"ders": "Edebiyat", "konu": "Tiyatro"},
-            {"ders": "Edebiyat", "konu": "Deneme"},
-            
-            # Tarih-1 (10 soru)
-            {"ders": "Tarih-1", "konu": "Osmanlı Tarihi"},
-            {"ders": "Tarih-1", "konu": "Osmanlı Kültür ve Medeniyeti"},
-            {"ders": "Tarih-1", "konu": "Osmanlı Devleti'nin Dağılma Süreci"},
-            {"ders": "Tarih-1", "konu": "XIX. Yüzyılda Osmanlı"},
-            {"ders": "Tarih-1", "konu": "Milli Mücadele"},
-            
-            # Coğrafya-1 (6 soru)
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Coğrafi Konumu"},
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Fiziki Coğrafyası"},
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Beşeri Coğrafyası"},
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin İklimi"},
-            {"ders": "Coğrafya-1", "konu": "Bölgeler Coğrafyası"},
-        ]
-        for idx, topic in enumerate(ayt_topics):
-            data = {
-                "id": str(uuid.uuid4()),
-                "student_id": student_id,
-                "ders": topic["ders"],
-                "konu": topic["konu"],
-                "durum": "baslanmadi",
-                "order_index": len(tyt_topics) + idx
-            }
-            response = supabase.table("topics").insert(data).execute()
-            topics.extend(response.data)
-    
-    elif bolum == "Sözel":
-        ayt_topics = [
-            # Edebiyat (24 soru)
-            {"ders": "Edebiyat", "konu": "Türk Edebiyatının Dönemleri"},
-            {"ders": "Edebiyat", "konu": "İslamiyet Öncesi Türk Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "İslamiyet Sonrası Türk Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Divan Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Halk Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Tanzimat Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Servetifünun Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Fecri Ati Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Milli Edebiyat"},
-            {"ders": "Edebiyat", "konu": "Cumhuriyet Dönemi Edebiyatı"},
-            {"ders": "Edebiyat", "konu": "Şiir İncelemesi"},
-            {"ders": "Edebiyat", "konu": "Hikaye ve Roman"},
-            {"ders": "Edebiyat", "konu": "Tiyatro"},
-            
-            # Tarih-1 (10 soru)
-            {"ders": "Tarih-1", "konu": "Osmanlı Tarihi"},
-            {"ders": "Tarih-1", "konu": "Osmanlı Kültür ve Medeniyeti"},
-            {"ders": "Tarih-1", "konu": "Osmanlı Devleti'nin Dağılma Süreci"},
-            {"ders": "Tarih-1", "konu": "XIX. Yüzyılda Osmanlı"},
-            {"ders": "Tarih-1", "konu": "Milli Mücadele"},
-            
-            # Coğrafya-1 (6 soru)
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Coğrafi Konumu"},
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Fiziki Coğrafyası"},
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin Beşeri Coğrafyası"},
-            {"ders": "Coğrafya-1", "konu": "Türkiye'nin İklimi"},
-            
-            # Tarih-2 (11 soru)
-            {"ders": "Tarih-2", "konu": "Atatürk İlkeleri"},
-            {"ders": "Tarih-2", "konu": "Türkiye Cumhuriyeti Tarihi"},
-            {"ders": "Tarih-2", "konu": "İnkılap Tarihi"},
-            {"ders": "Tarih-2", "konu": "Çağdaş Türk ve Dünya Tarihi"},
-            {"ders": "Tarih-2", "konu": "Savaşlar Arası Dönem"},
-            {"ders": "Tarih-2", "konu": "İkinci Dünya Savaşı"},
-            {"ders": "Tarih-2", "konu": "Soğuk Savaş Dönemi"},
-            
-            # Coğrafya-2 (11 soru)
-            {"ders": "Coğrafya-2", "konu": "Çevre ve Toplum"},
-            {"ders": "Coğrafya-2", "konu": "Doğal Sistemler"},
-            {"ders": "Coğrafya-2", "konu": "Ülkeler Coğrafyası"},
-            {"ders": "Coğrafya-2", "konu": "Küresel Ortam"},
-            {"ders": "Coğrafya-2", "konu": "Bölgeler Coğrafyası"},
-            
-            # Felsefe (12 soru)
-            {"ders": "Felsefe", "konu": "Felsefeye Giriş"},
-            {"ders": "Felsefe", "konu": "Bilgi Felsefesi"},
-            {"ders": "Felsefe", "konu": "Bilim Felsefesi"},
-            {"ders": "Felsefe", "konu": "Ahlak Felsefesi"},
-            {"ders": "Felsefe", "konu": "Sanat Felsefesi"},
-            {"ders": "Felsefe", "konu": "Din Felsefesi"},
-            {"ders": "Felsefe", "konu": "Siyaset Felsefesi"},
-            {"ders": "Felsefe", "konu": "Mantık"},
-            
-            # Din Kültürü (6 soru)
-            {"ders": "Din", "konu": "İslam Düşüncesi"},
-            {"ders": "Din", "konu": "Din Psikolojisi"},
-            {"ders": "Din", "konu": "Din Sosyolojisi"},
-            {"ders": "Din", "konu": "İslam ve Bilim"},
-        ]
-        for idx, topic in enumerate(ayt_topics):
-            data = {
-                "id": str(uuid.uuid4()),
-                "student_id": student_id,
-                "ders": topic["ders"],
-                "konu": topic["konu"],
-                "durum": "baslanmadi",
-                "order_index": len(tyt_topics) + idx
-            }
-            response = supabase.table("topics").insert(data).execute()
-            topics.extend(response.data)
+    if bolum in ayt_topics_dict:
+        for ders_name, konu_list in ayt_topics_dict[bolum].items():
+            for konu in konu_list:
+                data = {
+                    "id": str(uuid.uuid4()),
+                    "student_id": student_id,
+                    "ders": f"AYT - {ders_name}",
+                    "konu": konu,
+                    "durum": "baslanmadi",
+                    "sinav_turu": "AYT",
+                    "order_index": order_index
+                }
+                response = supabase.table("topics").insert(data).execute()
+                topics.extend(response.data)
+                order_index += 1
     
     return topics
 
@@ -543,7 +251,8 @@ async def create_task(task: TaskCreate):
         "tarih": task.tarih,
         "gun": task.gun,
         "order_index": task.order_index,
-        "completed": task.completed
+        "completed": task.completed,
+        "verilme_tarihi": datetime.now(timezone.utc).isoformat()
     }
     response = supabase.table("tasks").insert(data).execute()
     return response.data[0]
@@ -563,7 +272,6 @@ async def delete_task(task_id: str):
 @api_router.get("/exams/{student_id}")
 async def get_exams(student_id: str):
     response = supabase.table("exams").select("*").eq("student_id", student_id).order("tarih", desc=True).execute()
-    # Calculate net for each exam
     for exam in response.data:
         exam["net"] = exam["dogru"] - (exam["yanlis"] * 0.25)
     return response.data
