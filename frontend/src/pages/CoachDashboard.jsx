@@ -56,15 +56,21 @@ export default function CoachDashboard() {
   };
 
   const handleCreateStudent = async () => {
+    if (!newStudent.ad.trim()) {
+      toast.error('Lütfen öğrenci adını girin');
+      return;
+    }
     try {
       const response = await axios.post(`${BACKEND_URL}/api/students`, newStudent);
-      // Initialize topics
-      await axios.post(`${BACKEND_URL}/api/topics/init/${response.data.id}?bolum=${newStudent.bolum}`);
+      // Initialize topics - URL encode the bolum parameter
+      const encodedBolum = encodeURIComponent(newStudent.bolum);
+      await axios.post(`${BACKEND_URL}/api/topics/init/${response.data.id}?bolum=${encodedBolum}`);
       toast.success('Öğrenci başarıyla eklendi!');
       setOpenDialog(false);
       setNewStudent({ ad: '', soyad: '', bolum: 'Sayısal', hedef: '', notlar: '' });
       fetchStudents();
     } catch (error) {
+      console.error('Öğrenci ekleme hatası:', error);
       toast.error('Öğrenci eklenirken hata oluştu');
     }
   };
