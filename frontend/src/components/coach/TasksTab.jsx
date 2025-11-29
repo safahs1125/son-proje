@@ -46,32 +46,59 @@ export default function TasksTab({ studentId }) {
     }
   };
 
-  const handleAddTask = async () => {
-    if (!newTask.aciklama || newTask.sure <= 0) {
-      toast.error('Lütfen tüm alanları doldurun');
+  const handleAddTasks = async () => {
+    // Filter out empty tasks
+    const validTasks = newTasks.filter(t => t.aciklama.trim() && t.sure > 0);
+    
+    if (validTasks.length === 0) {
+      toast.error('Lütfen en az bir görev girin');
       return;
     }
+    
     try {
       const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
       const dayIndex = DAYS.indexOf(selectedDay);
       const taskDate = addDays(currentWeek, dayIndex);
+      const existingTaskCount = tasks.filter(t => t.gun === selectedDay).length;
       
-      await axios.post(`${BACKEND_URL}/api/tasks`, {
-        student_id: studentId,
-        aciklama: newTask.aciklama,
-        sure: parseInt(newTask.sure),
-        tarih: format(taskDate, 'yyyy-MM-dd'),
-        gun: selectedDay,
-        order_index: tasks.filter(t => t.gun === selectedDay).length,
-        completed: false
-      });
-      toast.success('Görev eklendi');
+      // Add all tasks
+      const promises = validTasks.map((task, index) => 
+        axios.post(`${BACKEND_URL}/api/tasks`, {
+          student_id: studentId,
+          aciklama: task.aciklama,
+          sure: parseInt(task.sure),
+          tarih: format(taskDate, 'yyyy-MM-dd'),
+          gun: selectedDay,
+          order_index: existingTaskCount + index,
+          completed: false
+        })
+      );
+      
+      await Promise.all(promises);
+      toast.success(`${validTasks.length} görev eklendi`);
       setOpenDialog(false);
-      setNewTask({ aciklama: '', sure: 0 });
+      setNewTasks([
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+        { aciklama: '', sure: 0 },
+      ]);
       fetchTasks();
     } catch (error) {
-      toast.error('Görev eklenemedi');
+      toast.error('Görevler eklenirken hata oluştu');
     }
+  };
+
+  const updateTaskField = (index, field, value) => {
+    const updated = [...newTasks];
+    updated[index][field] = value;
+    setNewTasks(updated);
   };
 
   const handleToggleComplete = async (task) => {
