@@ -193,6 +193,15 @@ async def init_topics(student_id: str, bolum: str):
     """Initialize default topics for a student based on their bolum"""
     topics = []
     
+    # Normalize bolum name to handle URL encoding issues
+    bolum_normalized = bolum.strip().lower()
+    if 'sayisal' in bolum_normalized or 'sayısal' in bolum_normalized:
+        bolum = "Sayısal"
+    elif 'esit' in bolum_normalized or 'eşit' in bolum_normalized:
+        bolum = "Eşit Ağırlık"
+    elif 'sozel' in bolum_normalized or 'sözel' in bolum_normalized:
+        bolum = "Sözel"
+    
     # TYT Topics for all students - GÜNCEL MÜFREDAT
     tyt_topics = [
         # Türkçe (40 soru)
