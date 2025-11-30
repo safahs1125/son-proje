@@ -101,3 +101,113 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+## Test Results - 30 Kasım 2025
+
+user_problem_statement: "TYT-AYT Koçluk Sistemi - Yeni eklenen özellikler (Coach Panel, Task Pool, vb.) yüklenemiyor hatası düzeltildi"
+
+backend:
+  - task: "Coach Calendar API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Endpoint'ler router'a dahil edilmeden sonra tanımlanmıştı. Satır 352'deki app.include_router'dan önceye taşındı. API testleri başarılı."
+        
+  - task: "Coach Notes API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Endpoint'ler düzeltildi, API testleri başarılı."
+        
+  - task: "Book Recommendations API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Endpoint'ler düzeltildi, API testleri başarılı."
+        
+  - task: "Task Pool API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Endpoint'ler düzeltildi, API testleri başarılı."
+
+frontend:
+  - task: "Coach Panel UI (Calendar, Notes, Books)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/CoachPanel.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Frontend screenshot testleri başarılı. Tüm sekmeler yükleniyor."
+        
+  - task: "Task Pool Component"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/coach/TaskPool.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "newTask is not defined hatası vardı. State tanımı düzeltildi (newTasks -> newTask)."
+      - working: true
+        agent: "main"
+        comment: "Düzeltme sonrası screenshot testleri başarılı. Task Pool görünüyor ve çalışıyor."
+        
+  - task: "Drag-and-Drop for Tasks"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/components/coach/TasksTab.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Henüz implement edilmedi. React-beautiful-dnd kütüphanesi kurulu ancak DragDropContext ve onDragEnd handler eklenmedi."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Drag-and-Drop for Tasks"
+    - "Bulk task creation (15 tasks at once)"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "KRİTİK SORUN ÇÖZÜLDÜ: Yeni endpoint'ler app.include_router(api_router) satırından SONRA tanımlandığı için router'a eklenmiyordu. Tüm yeni endpoint'ler (coach/calendar, coach/notes, books, task-pool) satır 352'den önceye taşındı. Backend ve frontend testleri başarılı. Sırada: Drag-and-drop özelliği implementasyonu."
