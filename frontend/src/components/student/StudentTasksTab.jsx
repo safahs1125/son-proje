@@ -225,6 +225,9 @@ export default function StudentTasksTab({ studentId, onRefresh }) {
         </Dialog>
       </div>
 
+      {/* Task Pool - Öğrenci için */}
+      <TaskPool studentId={studentId} onTaskAssigned={fetchTasks} />
+
       {/* Weekly View */}
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
         {DAYS.map((day) => {
