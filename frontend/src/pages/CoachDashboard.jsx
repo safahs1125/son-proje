@@ -109,6 +109,15 @@ export default function CoachDashboard() {
             <p className="text-gray-600">Öğrencilerinizi yönetin</p>
           </div>
           <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/coach/panel')}
+              data-testid="coach-panel-button"
+              className="bg-white"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Coach Panelim
+            </Button>
             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
               <DialogTrigger asChild>
                 <Button data-testid="add-student-button" className="bg-gradient-to-r from-violet-500 to-purple-600">
