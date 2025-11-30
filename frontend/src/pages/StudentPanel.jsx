@@ -123,6 +123,9 @@ export default function StudentPanel() {
           </div>
         </Card>
 
+        {/* Last 7 Days Summary */}
+        <Last7DaysSummary studentId={student.id} />
+
         {/* Tabs */}
         <Tabs defaultValue="tasks" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
