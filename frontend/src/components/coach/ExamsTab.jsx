@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import ExamChart from './ExamChart';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
