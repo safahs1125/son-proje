@@ -118,96 +118,97 @@ export default function TaskPool({ studentId, onTaskAssigned }) {
                 Tek Görev
               </Button>
             </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Havuza Görev Ekle</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Görev Açıklaması</label>
-                <Input
-                  value={newTask.aciklama}
-                  onChange={(e) => setNewTask({ ...newTask, aciklama: e.target.value })}
-                  placeholder="Ör: Matematik türev çalış"
-                />
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Havuza Görev Ekle</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Görev Açıklaması</label>
+                  <Input
+                    value={newTask.aciklama}
+                    onChange={(e) => setNewTask({ ...newTask, aciklama: e.target.value })}
+                    placeholder="Ör: Matematik türev çalış"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Süre (dakika)</label>
+                  <Input
+                    type="number"
+                    value={newTask.sure}
+                    onChange={(e) => setNewTask({ ...newTask, sure: e.target.value })}
+                    placeholder="60"
+                  />
+                </div>
+                <Button onClick={handleAddTask} className="w-full">
+                  Havuza Ekle
+                </Button>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Süre (dakika)</label>
-                <Input
-                  type="number"
-                  value={newTask.sure}
-                  onChange={(e) => setNewTask({ ...newTask, sure: e.target.value })}
-                  placeholder="60"
-                />
-              </div>
-              <Button onClick={handleAddTask} className="w-full">
-                Havuza Ekle
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
 
-        <Dialog open={openBulkDialog} onOpenChange={setOpenBulkDialog}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-600">
-              <Plus className="w-4 h-4 mr-2" />
-              Çoklu Ekle (15)
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Çoklu Görev Ekle (15'e kadar)</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3 mt-4">
-              <p className="text-sm text-gray-600">Boş bırakılan satırlar eklenmeyecek:</p>
-              {bulkTasks.map((task, index) => (
-                <Card key={index} className="p-3 bg-gray-50">
-                  <div className="grid grid-cols-12 gap-2 items-center">
-                    <span className="col-span-1 text-sm font-semibold text-gray-500">{index + 1}.</span>
-                    <Input
-                      className="col-span-2"
-                      value={task.ders}
-                      onChange={(e) => updateBulkTask(index, 'ders', e.target.value)}
-                      placeholder="Ders"
-                    />
-                    <Input
-                      className="col-span-2"
-                      value={task.konu}
-                      onChange={(e) => updateBulkTask(index, 'konu', e.target.value)}
-                      placeholder="Konu"
-                    />
-                    <select
-                      className="col-span-2 p-2 border rounded-md text-sm"
-                      value={task.zorluk}
-                      onChange={(e) => updateBulkTask(index, 'zorluk', e.target.value)}
-                    >
-                      <option value="">Zorluk</option>
-                      <option value="Kolay">Kolay</option>
-                      <option value="Orta">Orta</option>
-                      <option value="Zor">Zor</option>
-                    </select>
-                    <Input
-                      className="col-span-4"
-                      value={task.aciklama}
-                      onChange={(e) => updateBulkTask(index, 'aciklama', e.target.value)}
-                      placeholder="Görev detayı"
-                    />
-                    <Input
-                      className="col-span-1"
-                      type="number"
-                      value={task.sure || ''}
-                      onChange={(e) => updateBulkTask(index, 'sure', e.target.value)}
-                      placeholder="dk"
-                    />
-                  </div>
-                </Card>
-              ))}
-              <Button onClick={handleBulkAdd} className="w-full bg-gradient-to-r from-amber-500 to-orange-600">
-                Tüm Görevleri Havuza Ekle
+          <Dialog open={openBulkDialog} onOpenChange={setOpenBulkDialog}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-600">
+                <Plus className="w-4 h-4 mr-2" />
+                Çoklu Ekle (15)
               </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Çoklu Görev Ekle (15'e kadar)</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3 mt-4">
+                <p className="text-sm text-gray-600">Boş bırakılan satırlar eklenmeyecek:</p>
+                {bulkTasks.map((task, index) => (
+                  <Card key={index} className="p-3 bg-gray-50">
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <span className="col-span-1 text-sm font-semibold text-gray-500">{index + 1}.</span>
+                      <Input
+                        className="col-span-2"
+                        value={task.ders}
+                        onChange={(e) => updateBulkTask(index, 'ders', e.target.value)}
+                        placeholder="Ders"
+                      />
+                      <Input
+                        className="col-span-2"
+                        value={task.konu}
+                        onChange={(e) => updateBulkTask(index, 'konu', e.target.value)}
+                        placeholder="Konu"
+                      />
+                      <select
+                        className="col-span-2 p-2 border rounded-md text-sm"
+                        value={task.zorluk}
+                        onChange={(e) => updateBulkTask(index, 'zorluk', e.target.value)}
+                      >
+                        <option value="">Zorluk</option>
+                        <option value="Kolay">Kolay</option>
+                        <option value="Orta">Orta</option>
+                        <option value="Zor">Zor</option>
+                      </select>
+                      <Input
+                        className="col-span-4"
+                        value={task.aciklama}
+                        onChange={(e) => updateBulkTask(index, 'aciklama', e.target.value)}
+                        placeholder="Görev detayı"
+                      />
+                      <Input
+                        className="col-span-1"
+                        type="number"
+                        value={task.sure || ''}
+                        onChange={(e) => updateBulkTask(index, 'sure', e.target.value)}
+                        placeholder="dk"
+                      />
+                    </div>
+                  </Card>
+                ))}
+                <Button onClick={handleBulkAdd} className="w-full bg-gradient-to-r from-amber-500 to-orange-600">
+                  Tüm Görevleri Havuza Ekle
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="space-y-2">
