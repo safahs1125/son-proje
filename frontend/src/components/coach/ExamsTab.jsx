@@ -130,6 +130,9 @@ export default function ExamsTab({ studentId }) {
 
   return (
     <div className="space-y-6">
+      {/* Exam Chart */}
+      <ExamChart exams={exams} />
+
       {/* Add Exam Button */}
       <div className="flex justify-end">
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
