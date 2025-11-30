@@ -17,6 +17,7 @@ function App() {
           <Route path="/" element={<Navigate to="/coach/login" replace />} />
           <Route path="/coach/login" element={<CoachLogin />} />
           <Route path="/coach/dashboard" element={<CoachDashboard />} />
+          <Route path="/coach/panel" element={<CoachPanel />} />
           <Route path="/coach/student/:studentId" element={<StudentDetails />} />
           <Route path="/student" element={<StudentLogin />} />
           <Route path="/student/panel" element={<StudentPanel />} />
