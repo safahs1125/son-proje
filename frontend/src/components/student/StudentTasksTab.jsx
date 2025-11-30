@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import TaskPool from '@/components/coach/TaskPool';
+import TaskHistory from '@/components/coach/TaskHistory';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const DAYS = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
