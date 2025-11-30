@@ -8,6 +8,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import TaskPool from '@/components/coach/TaskPool';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const DAYS = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
