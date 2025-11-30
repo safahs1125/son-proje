@@ -538,11 +538,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
-# ====================================
-# NEW FEATURES - COACH PANEL
-# ====================================
-
 # Coach Calendar Events
 @api_router.get("/coach/calendar")
 async def get_coach_calendar():
