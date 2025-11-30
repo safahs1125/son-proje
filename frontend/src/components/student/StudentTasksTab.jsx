@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TaskPool from '@/components/coach/TaskPool';
 import TaskHistory from '@/components/coach/TaskHistory';
 
