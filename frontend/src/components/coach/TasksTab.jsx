@@ -226,30 +226,70 @@ export default function TasksTab({ studentId }) {
         </Dialog>
       </div>
 
-      {/* Task Pool and Weekly View with Drag & Drop */}
-      <DragDropContext onDragEnd={onDragEnd}>
-        <TaskPool studentId={studentId} onTaskAssigned={fetchTasks} />
+      {/* Task Pool */}
+      <TaskPool studentId={studentId} onTaskAssigned={fetchTasks} />
 
-        {/* Weekly View with Dates */}
-        <h3 className="text-xl font-bold text-gray-800 mt-6 mb-4">Bu Hafta</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
-          {DAYS.map((day, idx) => {
-            const dayTasks = getTasksByDay(day);
-            const totalMinutes = getDayTotalMinutes(day);
-            const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
-            const dayDate = addDays(currentWeek, idx);
-            
-            return (
-              <Droppable key={day} droppableId={day}>
-                {(provided, snapshot) => (
-                  <Card 
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className={`p-4 gradient-card ${snapshot.isDraggingOver ? 'ring-2 ring-purple-400' : ''}`}
-                    data-testid={`day-card-${day}`}
-                  >
-                    <div className="mb-3">
-                      <h4 className="font-bold text-gray-800 text-center">{day}</h4>
+      {/* Weekly View with Native Drag & Drop */}
+      <h3 className="text-xl font-bold text-gray-800 mt-6 mb-4">Bu Hafta</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+        {DAYS.map((day, idx) => {
+          const dayTasks = getTasksByDay(day);
+          const totalMinutes = getDayTotalMinutes(day);
+          const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
+          const dayDate = addDays(currentWeek, idx);
+          
+          return (
+            <Card 
+              key={day}
+              className="p-4 gradient-card"
+              data-testid={`day-card-${day}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add('ring-2', 'ring-purple-400');
+              }}
+              onDragLeave={(e) => {
+                e.currentTarget.classList.remove('ring-2', 'ring-purple-400');
+              }}
+              onDrop={async (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('ring-2', 'ring-purple-400');
+                
+                const taskPoolId = e.dataTransfer.getData('taskPoolId');
+                const taskId = e.dataTransfer.getData('taskId');
+                const sourceDay = e.dataTransfer.getData('sourceDay');
+
+                // Görev havuzundan atama
+                if (taskPoolId) {
+                  try {
+                    await axios.post(`${BACKEND_URL}/api/task-pool/${taskPoolId}/assign`, null, {
+                      params: {
+                        tarih: format(dayDate, 'yyyy-MM-dd'),
+                        gun: day
+                      }
+                    });
+                    toast.success('Görev atandı');
+                    fetchTasks();
+                  } catch (error) {
+                    toast.error('Görev atanamadı');
+                  }
+                }
+                // Günler arası taşıma
+                else if (taskId && sourceDay !== day) {
+                  try {
+                    await axios.put(`${BACKEND_URL}/api/tasks/${taskId}`, {
+                      gun: day,
+                      tarih: format(dayDate, 'yyyy-MM-dd')
+                    });
+                    toast.success('Görev taşındı');
+                    fetchTasks();
+                  } catch (error) {
+                    toast.error('Görev taşınamadı');
+                  }
+                }
+              }}
+            >
+              <div className="mb-3">
+                <h4 className="font-bold text-gray-800 text-center">{day}</h4>
                 <p className="text-xs text-gray-600 text-center">
                   {format(dayDate, 'd MMM yyyy', { locale: tr })}
                 </p>
