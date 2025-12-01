@@ -311,50 +311,62 @@ export default function TasksTab({ studentId }) {
                 </p>
               </div>
               
-              <div className="space-y-2">
-                {dayTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className={`p-3 rounded-lg bg-white shadow-sm border-l-4 ${
-                      task.completed ? 'border-green-500' : 'border-orange-500'
-                    }`}
-                    data-testid={`task-item-${task.id}`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => handleToggleComplete(task)}
-                        className="mt-1"
-                        data-testid={`task-checkbox-${task.id}`}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm break-words ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
-                          {task.aciklama}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">{task.sure}dk</p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteTask(task.id)}
-                        className="p-1 h-auto"
-                        data-testid={`delete-task-${task.id}`}
-                      >
-                        <Trash2 className="w-3 h-3 text-red-500" />
-                      </Button>
+                    <div className="space-y-2">
+                      {dayTasks.map((task, index) => (
+                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`p-3 rounded-lg bg-white shadow-sm border-l-4 ${
+                                task.completed ? 'border-green-500' : 'border-orange-500'
+                              } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
+                              data-testid={`task-item-${task.id}`}
+                            >
+                              <div className="flex items-start gap-2">
+                                <div {...provided.dragHandleProps} className="mt-1">
+                                  <GripVertical className="w-4 h-4 text-gray-400 cursor-grab" />
+                                </div>
+                                <input
+                                  type="checkbox"
+                                  checked={task.completed}
+                                  onChange={() => handleToggleComplete(task)}
+                                  className="mt-1"
+                                  data-testid={`task-checkbox-${task.id}`}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <p className={`text-sm break-words ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                                    {task.aciklama}
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1">{task.sure}dk</p>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteTask(task.id)}
+                                  className="p-1 h-auto"
+                                  data-testid={`delete-task-${task.id}`}
+                                >
+                                  <Trash2 className="w-3 h-3 text-red-500" />
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                      
+                      {dayTasks.length === 0 && (
+                        <p className="text-xs text-gray-400 text-center py-4">Görev yok</p>
+                      )}
                     </div>
-                  </div>
-                ))}
-                
-                {dayTasks.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">Görev yok</p>
+                  </Card>
                 )}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+              </Droppable>
+            );
+          })}
+        </div>
+      </DragDropContext>
 
       {/* Task History */}
       <div className="mt-8">
