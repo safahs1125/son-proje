@@ -184,10 +184,11 @@ export default function StudentPanel() {
 
         {/* Tabs */}
         <Tabs defaultValue="tasks" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="tasks" data-testid="student-tasks-tab">Görevlerim</TabsTrigger>
             <TabsTrigger value="topics" data-testid="student-topics-tab">Konular</TabsTrigger>
             <TabsTrigger value="exams" data-testid="student-exams-tab">Denemeler</TabsTrigger>
+            <TabsTrigger value="notifications" data-testid="student-notifications-tab">Bildirimler</TabsTrigger>
             <TabsTrigger value="calendar" data-testid="student-calendar-tab">Takvim</TabsTrigger>
           </TabsList>
 
