@@ -322,8 +322,8 @@ export default function TasksTab({ studentId }) {
                         className="mt-1"
                         data-testid={`task-checkbox-${task.id}`}
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm break-words ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <p className={`text-sm break-words whitespace-normal overflow-wrap-anywhere ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
                           {task.aciklama}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">{task.sure}dk</p>
