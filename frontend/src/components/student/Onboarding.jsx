@@ -99,8 +99,8 @@ export default function Onboarding({ studentId, onComplete, onSkip }) {
 
             <div>
               <label className="block text-sm font-semibold mb-2">Sınıf *</label>
-              <div className="grid grid-cols-2 gap-4">
-                {['12. Sınıf', 'Mezun'].map(sinif => (
+              <div className="grid grid-cols-3 gap-4">
+                {['11. Sınıf', '12. Sınıf', 'Mezun'].map(sinif => (
                   <Button
                     key={sinif}
                     onClick={() => handleInputChange('sinif', sinif)}
