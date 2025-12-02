@@ -204,6 +204,10 @@ export default function StudentPanel() {
             <StudentExamsView studentId={student.id} />
           </TabsContent>
 
+          <TabsContent value="notifications">
+            <Notifications studentId={student.id} />
+          </TabsContent>
+
           <TabsContent value="calendar">
             <StudentCalendarTab studentId={student.id} onRefresh={handleRefresh} />
           </TabsContent>
