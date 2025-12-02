@@ -789,6 +789,145 @@ async def get_daily_report(student_id: str, date: str):
         "most_studied_lesson": most_studied
     }
 
+# ====================================
+# FAZ 2: ANALİZ MOTORU
+# ====================================
+
+@api_router.get("/student/{student_id}/analysis")
+async def get_student_analysis(student_id: str):
+    """
+    Öğrenci için kapsamlı analiz:
+    - Zayıf konular (soru takip ve deneme sonuçlarına göre)
+    - Ders bazında başarı oranları
+    - Son 30 günlük trend
+    """
+    from datetime import date, timedelta
+    
+    # Son 30 günlük soru takip verileri
+    thirty_days_ago = (date.today() - timedelta(days=30)).isoformat()
+    soru_data = supabase.table("soru_takip").select("*").eq("student_id", student_id).gte("date", thirty_days_ago).execute()
+    
+    # Ders bazında analiz
+    lesson_stats = {}
+    for record in soru_data.data:
+        lesson = record["lesson"]
+        if lesson not in lesson_stats:
+            lesson_stats[lesson] = {
+                "lesson": lesson,
+                "total_solved": 0,
+                "total_correct": 0,
+                "total_wrong": 0,
+                "total_blank": 0,
+                "accuracy_rate": 0
+            }
+        
+        lesson_stats[lesson]["total_solved"] += record["solved"]
+        lesson_stats[lesson]["total_correct"] += record["correct"]
+        lesson_stats[lesson]["total_wrong"] += record["wrong"]
+        lesson_stats[lesson]["total_blank"] += record["blank"]
+    
+    # Başarı oranlarını hesapla
+    for lesson, stats in lesson_stats.items():
+        if stats["total_solved"] > 0:
+            stats["accuracy_rate"] = round((stats["total_correct"] / stats["total_solved"]) * 100, 1)
+    
+    # Zayıf konuları belirle (başarı oranı %60'ın altında olanlar)
+    weak_lessons = [stats for stats in lesson_stats.values() if stats["accuracy_rate"] < 60 and stats["total_solved"] > 5]
+    weak_lessons.sort(key=lambda x: x["accuracy_rate"])
+    
+    # Güçlü konular (başarı oranı %80'in üstünde olanlar)
+    strong_lessons = [stats for stats in lesson_stats.values() if stats["accuracy_rate"] >= 80 and stats["total_solved"] > 5]
+    strong_lessons.sort(key=lambda x: x["accuracy_rate"], reverse=True)
+    
+    # Genel istatistikler
+    total_solved = sum(s["total_solved"] for s in lesson_stats.values())
+    total_correct = sum(s["total_correct"] for s in lesson_stats.values())
+    overall_accuracy = round((total_correct / total_solved * 100), 1) if total_solved > 0 else 0
+    
+    # Deneme sonuçlarını da ekle
+    exams = supabase.table("exams").select("*").eq("student_id", student_id).order("tarih", desc=True).limit(5).execute()
+    
+    return {
+        "student_id": student_id,
+        "period": "Son 30 Gün",
+        "overall_stats": {
+            "total_solved": total_solved,
+            "total_correct": total_correct,
+            "accuracy_rate": overall_accuracy
+        },
+        "lesson_stats": list(lesson_stats.values()),
+        "weak_lessons": weak_lessons,
+        "strong_lessons": strong_lessons,
+        "recent_exams": exams.data
+    }
+
+@api_router.get("/coach/students-analysis")
+async def get_all_students_analysis():
+    """
+    Koç için tüm öğrencilerin analiz özeti
+    """
+    students = supabase.table("students").select("*").execute()
+    
+    students_analysis = []
+    for student in students.data:
+        # Her öğrenci için temel analiz
+        soru_data = supabase.table("soru_takip").select("*").eq("student_id", student["id"]).execute()
+        
+        total_solved = sum(s["solved"] for s in soru_data.data)
+        total_correct = sum(s["correct"] for s in soru_data.data)
+        accuracy = round((total_correct / total_solved * 100), 1) if total_solved > 0 else 0
+        
+        # Son aktivite tarihi
+        last_activity = None
+        if soru_data.data:
+            last_activity = max(s["date"] for s in soru_data.data)
+        
+        students_analysis.append({
+            "student_id": student["id"],
+            "student_name": f"{student['ad']} {student.get('soyad', '')}".strip(),
+            "bolum": student["bolum"],
+            "total_questions": total_solved,
+            "accuracy_rate": accuracy,
+            "last_activity": last_activity,
+            "needs_attention": accuracy < 60 or (last_activity and (date.today() - date.fromisoformat(last_activity)).days > 7)
+        })
+    
+    # Dikkat gerektiren öğrencileri önce sırala
+    students_analysis.sort(key=lambda x: (not x["needs_attention"], -x["accuracy_rate"]))
+    
+    return {
+        "total_students": len(students_analysis),
+        "students": students_analysis,
+        "attention_needed": len([s for s in students_analysis if s["needs_attention"]])
+    }
+
+@api_router.post("/coach/send-bulk-notification")
+async def send_bulk_notification(student_ids: List[str], notification: Notification):
+    """
+    Koç tarafından birden fazla öğrenciye bildirim gönderme
+    """
+    created_notifications = []
+    
+    for student_id in student_ids:
+        record = {
+            "id": str(uuid.uuid4()),
+            "user_id": student_id,
+            "type": notification.type,
+            "title": notification.title,
+            "message": notification.message,
+            "is_read": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        response = supabase.table("notifications").insert(record).execute()
+        created_notifications.extend(response.data)
+    
+    return {
+        "success": True,
+        "notifications_sent": len(created_notifications),
+        "notifications": created_notifications
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
