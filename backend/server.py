@@ -107,12 +107,33 @@ class TaskPoolItem(BaseModel):
     aciklama: str
     sure: int
 
+# Coach password storage (in production, use proper database)
+COACH_PASSWORD = os.environ.get('COACH_PASSWORD', 'coach2025')
+
 # Coach Authentication
 @api_router.post("/coach/login", response_model=CoachLoginResponse)
 async def coach_login(login: CoachLogin):
-    if login.password == "coach2025":
+    global COACH_PASSWORD
+    if login.password == COACH_PASSWORD:
         return CoachLoginResponse(success=True, token="coach-token-12345")
     raise HTTPException(status_code=401, detail="Şifre hatalı")
+
+# Coach Change Password
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+
+@api_router.post("/coach/change-password")
+async def change_coach_password(data: ChangePassword):
+    global COACH_PASSWORD
+    if data.current_password != COACH_PASSWORD:
+        raise HTTPException(status_code=401, detail="Mevcut şifre yanlış")
+    
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı")
+    
+    COACH_PASSWORD = data.new_password
+    return {"success": True, "message": "Şifre başarıyla değiştirildi"}
 
 # Students
 @api_router.get("/students")
