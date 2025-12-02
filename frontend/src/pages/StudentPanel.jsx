@@ -38,15 +38,23 @@ export default function StudentPanel() {
       const response = await axios.get(`${BACKEND_URL}/api/students/${studentId}`);
       setStudent(response.data);
       
-      // Check onboarding status
-      const onboardingResponse = await axios.get(`${BACKEND_URL}/api/student/${studentId}/onboarding`);
-      setOnboardingData(onboardingResponse.data);
-      
-      // Show onboarding if not completed
-      if (!onboardingResponse.data.onboarding_completed) {
+      // Check onboarding status (safe fallback)
+      try {
+        const onboardingResponse = await axios.get(`${BACKEND_URL}/api/student/${studentId}/onboarding`);
+        setOnboardingData(onboardingResponse.data);
+        
+        // Show onboarding if not completed
+        if (!onboardingResponse.data.onboarding_completed) {
+          setShowOnboarding(true);
+        }
+      } catch (onboardingError) {
+        console.log('Onboarding data not available:', onboardingError);
+        // Set default onboarding data if endpoint fails
+        setOnboardingData({ onboarding_completed: false });
         setShowOnboarding(true);
       }
     } catch (error) {
+      console.error('Student fetch error:', error);
       toast.error('Bilgiler yüklenemedi');
       localStorage.removeItem('studentToken');
       localStorage.removeItem('studentId');
