@@ -866,6 +866,8 @@ async def get_all_students_analysis():
     """
     Koç için tüm öğrencilerin analiz özeti
     """
+    from datetime import date, timedelta
+    
     students = supabase.table("students").select("*").execute()
     
     students_analysis = []
