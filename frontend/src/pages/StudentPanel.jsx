@@ -4,13 +4,14 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, RefreshCw } from 'lucide-react';
+import { LogOut, RefreshCw, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import StudentTasksTab from '@/components/student/StudentTasksTab';
 import StudentTopicsView from '@/components/student/StudentTopicsView';
 import StudentExamsView from '@/components/student/StudentExamsView';
 import StudentCalendarTab from '@/components/student/StudentCalendarTab';
 import Last7DaysSummary from '@/components/student/Last7DaysSummary';
+import Onboarding from '@/components/student/Onboarding';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
