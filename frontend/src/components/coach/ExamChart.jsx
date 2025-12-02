@@ -1,65 +1,111 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function ExamChart({ exams }) {
   if (!exams || exams.length === 0) {
     return null;
   }
 
-  // Group exams by date and subject
-  const groupedData = {};
-  
+  // 1. Toplam Net Grafiği - Tarih bazlı toplam net
+  const totalNetData = {};
   exams.forEach(exam => {
     const dateKey = exam.tarih;
-    if (!groupedData[dateKey]) {
-      groupedData[dateKey] = { date: dateKey };
+    if (!totalNetData[dateKey]) {
+      totalNetData[dateKey] = { date: dateKey, toplamNet: 0 };
     }
-    groupedData[dateKey][exam.ders] = exam.net;
+    totalNetData[dateKey].toplamNet += exam.net;
   });
 
-  const chartData = Object.values(groupedData).sort((a, b) => 
+  const totalChartData = Object.values(totalNetData).sort((a, b) => 
     new Date(a.date) - new Date(b.date)
   );
 
-  // Get unique subjects for lines
+  // 2. Ders Bazlı Net Grafiği
+  const subjectData = {};
+  exams.forEach(exam => {
+    const dateKey = exam.tarih;
+    if (!subjectData[dateKey]) {
+      subjectData[dateKey] = { date: dateKey };
+    }
+    subjectData[dateKey][exam.ders] = exam.net;
+  });
+
+  const subjectChartData = Object.values(subjectData).sort((a, b) => 
+    new Date(a.date) - new Date(b.date)
+  );
+
+  // Get unique subjects
   const subjects = [...new Set(exams.map(e => e.ders))];
   
-  // Colors for different subjects
+  // Professional colors for subjects
   const colors = [
-    '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', 
-    '#ef4444', '#ec4899', '#06b6d4', '#84cc16'
+    '#6366f1', '#8b5cf6', '#ec4899', '#f97316', 
+    '#10b981', '#06b6d4', '#eab308', '#ef4444'
   ];
 
   return (
-    <Card className="p-6 gradient-card">
-      <h3 className="text-xl font-bold text-gray-800 mb-4">Net Gelişim Grafiği</h3>
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            dataKey="date" 
-            tickFormatter={(value) => new Date(value).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
-          />
-          <YAxis />
-          <Tooltip 
-            labelFormatter={(value) => new Date(value).toLocaleDateString('tr-TR')}
-            formatter={(value) => [value.toFixed(2), 'Net']}
-          />
-          <Legend />
-          {subjects.map((subject, index) => (
-            <Line
-              key={subject}
-              type="monotone"
-              dataKey={subject}
-              stroke={colors[index % colors.length]}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+    <div className="space-y-6">
+      {/* Toplam Net Grafiği */}
+      <Card className="p-6 bg-gradient-to-br from-indigo-50 to-white shadow-lg">
+        <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Toplam Net Gelişimi</h3>
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={totalChartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis 
+              dataKey="date" 
+              tickFormatter={(value) => new Date(value).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+              stroke="#6b7280"
             />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
-    </Card>
+            <YAxis stroke="#6b7280" />
+            <Tooltip 
+              labelFormatter={(value) => new Date(value).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              formatter={(value) => [value.toFixed(1) + ' Net', 'Toplam']}
+              contentStyle={{ backgroundColor: '#fff', border: '2px solid #6366f1', borderRadius: '8px' }}
+            />
+            <Bar 
+              dataKey="toplamNet" 
+              fill="#6366f1" 
+              radius={[8, 8, 0, 0]}
+              name="Toplam Net"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
+      {/* Ders Bazlı Net Grafiği */}
+      <Card className="p-6 bg-gradient-to-br from-purple-50 to-white shadow-lg">
+        <h3 className="text-xl font-bold text-gray-800 mb-4">📚 Ders Bazlı Net Gelişimi</h3>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={subjectChartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis 
+              dataKey="date" 
+              tickFormatter={(value) => new Date(value).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+              stroke="#6b7280"
+            />
+            <YAxis stroke="#6b7280" />
+            <Tooltip 
+              labelFormatter={(value) => new Date(value).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              formatter={(value) => [value.toFixed(1) + ' Net', '']}
+              contentStyle={{ backgroundColor: '#fff', border: '2px solid #8b5cf6', borderRadius: '8px' }}
+            />
+            <Legend 
+              wrapperStyle={{ paddingTop: '20px' }}
+              iconType="rect"
+            />
+            {subjects.map((subject, index) => (
+              <Bar
+                key={subject}
+                dataKey={subject}
+                fill={colors[index % colors.length]}
+                radius={[4, 4, 0, 0]}
+                name={subject}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+    </div>
   );
 }
