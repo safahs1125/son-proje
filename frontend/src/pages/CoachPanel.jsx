@@ -15,6 +15,10 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function CoachPanel() {
   const navigate = useNavigate();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('coachToken');
@@ -22,6 +26,39 @@ export default function CoachPanel() {
       navigate('/coach/login');
     }
   }, []);
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('Lütfen tüm alanları doldurun');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('Yeni şifreler eşleşmiyor');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('Yeni şifre en az 6 karakter olmalı');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.post(`${BACKEND_URL}/api/coach/change-password`, {
+        current_password: currentPassword,
+        new_password: newPassword
+      });
+      toast.success('Şifre başarıyla değiştirildi');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Şifre değiştirilemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen p-4 md:p-8">
