@@ -12,6 +12,8 @@ import StudentExamsView from '@/components/student/StudentExamsView';
 import StudentCalendarTab from '@/components/student/StudentCalendarTab';
 import Last7DaysSummary from '@/components/student/Last7DaysSummary';
 import Onboarding from '@/components/student/Onboarding';
+import SoruTakip from '@/components/student/SoruTakip';
+import Notifications from '@/components/student/Notifications';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
