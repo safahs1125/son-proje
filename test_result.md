@@ -153,6 +153,42 @@ backend:
       - working: true
         agent: "main"
         comment: "Endpoint'ler düzeltildi, API testleri başarılı."
+        
+  - task: "Student Analysis API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "API endpoint /api/student/{id}/analysis çalışıyor. Örnek response: overall_stats (145 soru, 95 doğru, %65.5 başarı), lesson_stats (Matematik, Fizik, Kimya), weak_lessons ve strong_lessons verileri doğru şekilde dönüyor."
+        
+  - task: "Coach Students Analysis API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "API endpoint /api/coach/students-analysis çalışıyor. Response: total_students: 3, attention_needed: 0, students array ile öğrenci detayları (id, name, bolum, total_questions, accuracy_rate, last_activity, needs_attention) doğru şekilde dönüyor."
+        
+  - task: "Bulk Notification API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "API endpoint /api/coach/send-bulk-notification çalışıyor. Toplu bildirim gönderimi başarılı şekilde gerçekleştiriliyor. Backend loglarında POST request'i 200 OK dönüyor."
 
 frontend:
   - task: "Coach Panel UI (Calendar, Notes, Books)"
