@@ -334,11 +334,101 @@ test_plan:
 
 **Sonuç:** Tüm analiz modülü özellikleri başarıyla çalışıyor. Faz 2 analiz modülü test gereksinimlerini karşılıyor.
 
+## Test Results - Faz 3 Raporlama Modülü - 4 Aralık 2025
+
+frontend:
+  - task: "Student Reports Tab - Weekly Report"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/student/StudentReports.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Faz 3 raporlama modülü test edilecek. Öğrenci panelinde haftalık rapor sekmesi - 4 özet kart, günlük çalışma line chart, ders bazında bar chart kontrol edilecek."
+        
+  - task: "Student Reports Tab - Monthly Report"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/student/StudentReports.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Aylık rapor sekmesi test edilecek. 4 özet kart, haftalık ilerleme line chart, ders bazında aylık performans kartları kontrol edilecek."
+        
+  - task: "Coach Weekly Report Tab"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/coach/CoachWeeklyReport.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Koç haftalık rapor sekmesi test edilecek. Dönem bilgisi, 4 özet kart, en çok gelişen öğrenciler, tüm öğrencilerin durumu kontrol edilecek."
+
+backend:
+  - task: "Student Weekly Report API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "API endpoint /api/student/{id}/reports/weekly test edilecek. Response yapısı ve data doğruluğu kontrol edilecek."
+        
+  - task: "Student Monthly Report API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "API endpoint /api/student/{id}/reports/monthly test edilecek. Response yapısı ve data doğruluğu kontrol edilecek."
+        
+  - task: "Coach Weekly Summary API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "API endpoint /api/coach/reports/weekly-summary test edilecek. Response yapısı ve data doğruluğu kontrol edilecek."
+
+test_plan:
+  current_focus:
+    - "Student Reports Tab - Weekly Report"
+    - "Student Reports Tab - Monthly Report"
+    - "Coach Weekly Report Tab"
+    - "Student Weekly Report API"
+    - "Student Monthly Report API"
+    - "Coach Weekly Summary API"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
 agent_communication:
   - agent: "main"
     message: "KRİTİK SORUN ÇÖZÜLDÜ: Yeni endpoint'ler app.include_router(api_router) satırından SONRA tanımlandığı için router'a eklenmiyordu. Tüm yeni endpoint'ler (coach/calendar, coach/notes, books, task-pool) satır 352'den önceye taşındı. Backend ve frontend testleri başarılı. Sırada: Drag-and-drop özelliği implementasyonu."
   - agent: "testing"
     message: "TYT-AYT Koçluk Sistemi Faz 2 Analiz Modülü test edildi. ÖĞRENCİ ANALİZ MODÜLÜ: Tamamen çalışıyor - performans kartları, ders bazlı grafikler, zayıf/güçlü konular görüntüleniyor. KOÇLUK ANALİZ MODÜLÜ: Çalışıyor - özet kartlar (Toplam Öğrenci: 3, Dikkat Gerekli: 0, İyi Giden: 3), öğrenci listesi ve seçim sistemi aktif. TOPLU BİLDİRİM SİSTEMİ: Çalışıyor - modal açılıyor, form doldurulabiliyor, bildirimler gönderilebiliyor. ÖĞRENCİ BİLDİRİM ALMA: Çalışıyor - bildirimler sekmesi aktif, mevcut bildirimler görüntüleniyor. Tüm temel işlevsellik doğrulandı."
+  - agent: "testing"
+    message: "Faz 3 Raporlama Modülü test başlatılıyor. Test senaryoları: 1) Öğrenci haftalık rapor (4 özet kart, line chart, bar chart), 2) Öğrenci aylık rapor (4 özet kart, haftalık ilerleme, ders kartları), 3) Koç haftalık rapor (dönem bilgisi, özet kartlar, gelişen öğrenciler listesi), 4) API endpoint testleri. Credentials: Öğrenci token a433c2fd-a01e-4219-a56f-4d1118de0eb6, Koç şifresi coach2025."
 
 ---
 
