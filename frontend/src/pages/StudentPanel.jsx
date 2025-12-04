@@ -15,6 +15,7 @@ import Onboarding from '@/components/student/Onboarding';
 import SoruTakip from '@/components/student/SoruTakip';
 import Notifications from '@/components/student/Notifications';
 import StudentAnalysis from '@/components/student/StudentAnalysis';
+import StudentReports from '@/components/student/StudentReports';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
