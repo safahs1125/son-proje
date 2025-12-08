@@ -125,36 +125,42 @@ export default function StudentExamsView({ studentId }) {
         </div>
       )}
       
-      {/* Eski Denemeler (exams tablosundan) */}
+      {/* Eski Denemeler (exams tablosundan) - Liste Görünümü */}
       {groupExamsByDate().length > 0 && (
         <div className="space-y-4">
           <h3 className="text-lg font-bold text-gray-800">Eski Denemeler</h3>
           {groupExamsByDate().map((exam, idx) => {
             const totalNet = exam.subjects.reduce((sum, s) => sum + s.net, 0);
             return (
-              <Card key={idx} className="p-6 gradient-card" data-testid={`student-exam-card-${idx}`}>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">{exam.type} Denemesi</h3>
-                    <p className="text-sm text-gray-600">{new Date(exam.date).toLocaleDateString('tr-TR')}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Toplam Net</p>
-                    <p className="text-3xl font-bold text-amber-600">{totalNet.toFixed(2)}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {exam.subjects.map((subject) => (
-                    <div key={subject.id} className="p-3 bg-white rounded-lg shadow-sm">
-                      <p className="font-medium text-gray-800 mb-2">{subject.ders}</p>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-green-600">D: {subject.dogru}</span>
-                        <span className="text-red-600">Y: {subject.yanlis}</span>
-                        <span className="font-bold text-amber-600">Net: {subject.net.toFixed(2)}</span>
-                      </div>
+              <Card key={idx} className="p-4 gradient-card hover:shadow-lg transition-shadow" data-testid={`student-exam-card-${idx}`}>
+                <div className="flex items-center justify-between">
+                  {/* Deneme Bilgisi */}
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-800">{exam.type} Denemesi</h3>
+                    <div className="flex items-center gap-3 text-sm text-gray-600 mt-1">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(exam.date).toLocaleDateString('tr-TR')}
+                      </span>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Net Skoru */}
+                  <div className="text-center px-4">
+                    <p className="text-xs text-gray-600">Net</p>
+                    <p className="text-2xl font-bold text-amber-600">{totalNet.toFixed(2)}</p>
+                  </div>
+
+                  {/* Detay Butonu */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openDetailModal({ oldExam: exam })}
+                    className="ml-3"
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    Detay
+                  </Button>
                 </div>
               </Card>
             );
