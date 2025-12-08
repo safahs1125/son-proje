@@ -1176,6 +1176,278 @@ async def get_coach_weekly_summary():
         "all_students": students_summary
     }
 
+# ====================================
+# DENEME ANALİZ SİSTEMİ
+# ====================================
+
+# Models
+class ManualExamEntry(BaseModel):
+    student_id: str
+    exam_name: str
+    exam_date: str
+    subjects: List[Dict]
+
+class TopicProgressUpdate(BaseModel):
+    status: str
+
+# Analyzer instance
+exam_analyzer = ExamAnalyzer(api_key=os.environ.get('EMERGENT_LLM_KEY', ''))
+
+@api_router.post("/exam/upload-and-analyze")
+async def upload_and_analyze_exam(
+    student_id: str,
+    uploaded_by: str,
+    exam_name: str,
+    exam_date: str,
+    file: UploadFile = File(...)
+):
+    """
+    Deneme dosyasını yükle ve AI ile analiz et
+    """
+    try:
+        # Dosyayı geçici olarak kaydet
+        file_extension = file.filename.split('.')[-1].lower()
+        temp_filename = f"/tmp/{uuid.uuid4()}.{file_extension}"
+        
+        with open(temp_filename, "wb") as f:
+            content = await file.read()
+            f.write(content)
+        
+        # Dosya tipini belirle
+        file_type = "pdf" if file_extension == "pdf" else "image"
+        
+        # exam_uploads tablosuna kaydet
+        upload_record = {
+            "id": str(uuid.uuid4()),
+            "student_id": student_id,
+            "uploaded_by": uploaded_by,
+            "file_url": temp_filename,  # Production'da S3/Supabase storage kullanılmalı
+            "file_type": file_type,
+            "exam_date": exam_date,
+            "exam_name": exam_name,
+            "analysis_status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        upload_response = supabase.table("exam_uploads").insert(upload_record).execute()
+        upload_id = upload_response.data[0]["id"]
+        
+        # AI analiz yap
+        analysis_result = await exam_analyzer.analyze_exam_document(temp_filename, file_type)
+        
+        if analysis_result["success"]:
+            analysis_data = analysis_result["analysis"]
+            
+            # Zayıf konuları tespit et
+            weak_topics = analysis_data.get("weak_topics", [])
+            
+            # Öneriler oluştur
+            recommendations = exam_analyzer.generate_recommendations(
+                weak_topics,
+                analysis_data.get("subjects", [])
+            )
+            
+            # exam_analysis tablosuna kaydet
+            analysis_record = {
+                "id": str(uuid.uuid4()),
+                "upload_id": upload_id,
+                "student_id": student_id,
+                "total_net": analysis_data.get("total_net", 0),
+                "subject_breakdown": json.dumps(analysis_data.get("subjects", [])),
+                "topic_breakdown": json.dumps(analysis_data.get("topics", [])),
+                "weak_topics": json.dumps(weak_topics),
+                "recommendations": recommendations,
+                "ai_raw_response": analysis_result.get("raw_response", ""),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            supabase.table("exam_analysis").insert(analysis_record).execute()
+            
+            # Upload status güncelle
+            supabase.table("exam_uploads").update({"analysis_status": "completed"}).eq("id", upload_id).execute()
+            
+            # Bildirim gönder
+            notification_record = {
+                "id": str(uuid.uuid4()),
+                "user_id": student_id,
+                "type": "success",
+                "title": "Deneme Analizi Tamamlandı",
+                "message": f"{exam_name} denemesi başarıyla analiz edildi. Toplam net: {analysis_data.get('total_net', 0)}",
+                "is_read": False,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            supabase.table("notifications").insert(notification_record).execute()
+            
+            return {
+                "success": True,
+                "upload_id": upload_id,
+                "analysis": analysis_data,
+                "recommendations": recommendations
+            }
+        else:
+            # Analiz başarısız
+            supabase.table("exam_uploads").update({"analysis_status": "failed"}).eq("id", upload_id).execute()
+            
+            return {
+                "success": False,
+                "error": analysis_result.get("error", "Analiz başarısız"),
+                "upload_id": upload_id
+            }
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/exam/manual-entry")
+async def manual_exam_entry(entry: ManualExamEntry):
+    """
+    Manuel deneme sonucu girişi
+    """
+    try:
+        # Net hesapla
+        calculation = exam_analyzer.calculate_net_from_manual(entry.subjects)
+        
+        # exam_uploads tablosuna kaydet (manuel)
+        upload_record = {
+            "id": str(uuid.uuid4()),
+            "student_id": entry.student_id,
+            "uploaded_by": "student",
+            "file_url": None,
+            "file_type": "manual",
+            "exam_date": entry.exam_date,
+            "exam_name": entry.exam_name,
+            "analysis_status": "completed",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        upload_response = supabase.table("exam_uploads").insert(upload_record).execute()
+        upload_id = upload_response.data[0]["id"]
+        
+        # exam_analysis tablosuna kaydet
+        analysis_record = {
+            "id": str(uuid.uuid4()),
+            "upload_id": upload_id,
+            "student_id": entry.student_id,
+            "total_net": calculation["total_net"],
+            "subject_breakdown": json.dumps(calculation["subjects"]),
+            "topic_breakdown": json.dumps([]),
+            "weak_topics": json.dumps([]),
+            "recommendations": "Manuel girişte detaylı analiz yapılamıyor. Lütfen PDF/görsel yükleyiniz.",
+            "ai_raw_response": "Manuel giriş",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        supabase.table("exam_analysis").insert(analysis_record).execute()
+        
+        return {
+            "success": True,
+            "upload_id": upload_id,
+            "calculation": calculation
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/exam/student-exams/{student_id}")
+async def get_student_exams(student_id: str):
+    """
+    Öğrencinin tüm denemelerini getir
+    """
+    try:
+        # Uploads getir
+        uploads = supabase.table("exam_uploads").select("*").eq("student_id", student_id).order("created_at", desc=True).execute()
+        
+        results = []
+        for upload in uploads.data:
+            # İlgili analizi getir
+            analysis = supabase.table("exam_analysis").select("*").eq("upload_id", upload["id"]).execute()
+            
+            result = {
+                "upload": upload,
+                "analysis": analysis.data[0] if analysis.data else None
+            }
+            results.append(result)
+        
+        return results
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/exam/coach-overview")
+async def get_coach_exam_overview():
+    """
+    Koç için tüm öğrencilerin denemelerini getir
+    """
+    try:
+        # Tüm uploads
+        uploads = supabase.table("exam_uploads").select("*").order("created_at", desc=True).limit(50).execute()
+        
+        results = []
+        for upload in uploads.data:
+            # Öğrenci bilgisi
+            student = supabase.table("students").select("*").eq("id", upload["student_id"]).execute()
+            
+            # Analiz
+            analysis = supabase.table("exam_analysis").select("*").eq("upload_id", upload["id"]).execute()
+            
+            result = {
+                "upload": upload,
+                "student": student.data[0] if student.data else None,
+                "analysis": analysis.data[0] if analysis.data else None
+            }
+            results.append(result)
+        
+        return results
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/topic-progress/{student_id}")
+async def get_topic_progress(student_id: str):
+    """
+    Öğrencinin konu ilerleme durumunu getir
+    """
+    try:
+        progress = supabase.table("topic_progress").select("*").eq("student_id", student_id).execute()
+        return progress.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/topic-progress/{progress_id}")
+async def update_topic_progress(progress_id: str, update: TopicProgressUpdate):
+    """
+    Konu ilerleme durumunu güncelle
+    """
+    try:
+        response = supabase.table("topic_progress").update({
+            "status": update.status,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }).eq("id", progress_id).execute()
+        
+        return response.data[0] if response.data else None
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/topic-progress")
+async def create_topic_progress(student_id: str, topic_id: str, subject: str, topic_name: str, status: str = "cozulmedi"):
+    """
+    Yeni konu ilerleme kaydı oluştur
+    """
+    try:
+        record = {
+            "id": str(uuid.uuid4()),
+            "student_id": student_id,
+            "topic_id": topic_id,
+            "subject": subject,
+            "topic_name": topic_name,
+            "status": status,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        response = supabase.table("topic_progress").insert(record).execute()
+        return response.data[0] if response.data else None
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
 
 app.add_middleware(
