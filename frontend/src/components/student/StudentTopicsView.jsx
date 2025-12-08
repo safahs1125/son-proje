@@ -44,17 +44,66 @@ export default function StudentTopicsView({ studentId }) {
     return Math.round((completed / topics.length) * 100);
   };
 
-  const getStatusBadge = (durum) => {
+  const updateTopicStatus = async (topicId, currentStatus) => {
+    // Durum sırası: baslanmadi -> devam -> tamamlandi -> baslanmadi
+    let newStatus;
+    if (currentStatus === 'baslanmadi') {
+      newStatus = 'devam';
+    } else if (currentStatus === 'devam') {
+      newStatus = 'tamamlandi';
+    } else {
+      newStatus = 'baslanmadi';
+    }
+
+    try {
+      await axios.put(`${BACKEND_URL}/api/topics/${topicId}`, {
+        durum: newStatus
+      });
+      
+      // Listeyi güncelle
+      setTopics(prevTopics =>
+        prevTopics.map(topic =>
+          topic.id === topicId ? { ...topic, durum: newStatus } : topic
+        )
+      );
+      
+      toast.success('Konu durumu güncellendi');
+    } catch (error) {
+      toast.error('Güncelleme başarısız');
+    }
+  };
+
+  const getStatusBadge = (topic) => {
+    const durum = topic.durum;
+    let buttonClass = '';
+    let text = '';
+    
     switch (durum) {
       case 'baslanmadi':
-        return <span className="status-badge status-baslanmadi">Başlanmadı</span>;
+        buttonClass = 'bg-gray-200 text-gray-700 hover:bg-gray-300';
+        text = 'Başlanmadı';
+        break;
       case 'devam':
-        return <span className="status-badge status-devam">Devam Ediyor</span>;
+        buttonClass = 'bg-amber-200 text-amber-800 hover:bg-amber-300';
+        text = 'Devam Ediyor';
+        break;
       case 'tamamlandi':
-        return <span className="status-badge status-tamamlandi">Tamamlandı</span>;
+        buttonClass = 'bg-green-200 text-green-800 hover:bg-green-300';
+        text = 'Tamamlandı';
+        break;
       default:
-        return null;
+        buttonClass = 'bg-gray-200 text-gray-700';
+        text = 'Başlanmadı';
     }
+    
+    return (
+      <button
+        onClick={() => updateTopicStatus(topic.id, durum)}
+        className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${buttonClass}`}
+      >
+        {text}
+      </button>
+    );
   };
 
   if (loading) {
