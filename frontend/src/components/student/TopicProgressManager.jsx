@@ -101,25 +101,25 @@ export default function TopicProgressManager({ studentId }) {
   const subjects = examType === 'TYT' ? TYT_SUBJECTS : AYT_SUBJECTS;
 
   if (loading) {
-    return <div className=\"text-center text-gray-500\">Yükleniyor...</div>;
+    return <div className="text-center text-gray-500">Yükleniyor...</div>;
   }
 
   return (
-    <Card className=\"p-6 gradient-card\">
-      <h3 className=\"text-xl font-bold text-gray-800 mb-4\">Konu İlerleme Durumu</h3>
+    <Card className="p-6 gradient-card">
+      <h3 className="text-xl font-bold text-gray-800 mb-4">Konu İlerleme Durumu</h3>
 
-      <Tabs value={examType} onValueChange={setExamType} className=\"w-full\">
-        <TabsList className=\"grid w-full grid-cols-2 mb-4\">
-          <TabsTrigger value=\"TYT\">TYT Konular</TabsTrigger>
-          <TabsTrigger value=\"AYT\">AYT Konular</TabsTrigger>
+      <Tabs value={examType} onValueChange={setExamType} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="TYT">TYT Konular</TabsTrigger>
+          <TabsTrigger value="AYT">AYT Konular</TabsTrigger>
         </TabsList>
 
         <TabsContent value={examType}>
-          <div className=\"space-y-4\">
+          <div className="space-y-4">
             {Object.entries(subjects).map(([subject, topics]) => (
-              <Card key={subject} className=\"p-4 bg-white\">
-                <h4 className=\"font-bold text-gray-800 mb-3\">{subject}</h4>
-                <div className=\"space-y-2\">
+              <Card key={subject} className="p-4 bg-white">
+                <h4 className="font-bold text-gray-800 mb-3">{subject}</h4>
+                <div className="space-y-2">
                   {topics.map((topic) => {
                     const key = `${subject}-${topic}`;
                     const currentProgress = progress[key];
@@ -130,12 +130,12 @@ export default function TopicProgressManager({ studentId }) {
                         key={topic}
                         className={`p-3 bg-gradient-to-r ${getStatusColor(status)} border-2`}
                       >
-                        <div className=\"flex items-center justify-between\">
-                          <div className=\"flex items-center gap-3\">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
                             {getStatusIcon(status)}
-                            <span className=\"font-semibold text-gray-800\">{topic}</span>
+                            <span className="font-semibold text-gray-800">{topic}</span>
                           </div>
-                          <div className=\"flex gap-2\">
+                          <div className="flex gap-2">
                             <button
                               onClick={() => updateTopicStatus(subject, topic, 'cozulmedi')}
                               className={`px-3 py-1 rounded text-xs ${ 
