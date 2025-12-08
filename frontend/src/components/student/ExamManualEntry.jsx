@@ -170,7 +170,7 @@ export default function ExamManualEntry({ studentId, onComplete }) {
               </div>
 
               {/* Doğru/Yanlış/Boş */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">Doğru</label>
                   <Input
