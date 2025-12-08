@@ -792,6 +792,19 @@ async def get_notifications(student_id: str, unread_only: bool = False):
     response = query.order("created_at", desc=True).limit(50).execute()
     return response.data
 
+@api_router.get("/student/coach/notifications")
+async def get_coach_notifications(unread_only: bool = False):
+    """
+    Koç için bildirimleri getir
+    """
+    query = supabase.table("notifications").select("*").eq("user_id", "coach")
+    
+    if unread_only:
+        query = query.eq("is_read", False)
+    
+    response = query.order("created_at", desc=True).limit(100).execute()
+    return response.data
+
 @api_router.put("/notifications/{notification_id}/read")
 async def mark_notification_read(notification_id: str):
     response = supabase.table("notifications").update({"is_read": True}).eq("id", notification_id).execute()
