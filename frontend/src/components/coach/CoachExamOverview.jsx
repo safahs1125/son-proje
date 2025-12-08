@@ -10,6 +10,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export default function CoachExamOverview() {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [analyzingId, setAnalyzingId] = useState(null);
 
   useEffect(() => {
     fetchExams();
@@ -23,6 +24,22 @@ export default function CoachExamOverview() {
       console.error('Fetch error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const triggerAnalysis = async (uploadId) => {
+    setAnalyzingId(uploadId);
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/exam/trigger-analysis/${uploadId}`);
+      
+      if (response.data.success) {
+        toast.success('AI analizi tamamlandı!');
+        fetchExams(); // Listeyi yenile
+      }
+    } catch (error) {
+      toast.error('Analiz hatası: ' + error.message);
+    } finally {
+      setAnalyzingId(null);
     }
   };
 
