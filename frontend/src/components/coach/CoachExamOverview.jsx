@@ -97,41 +97,68 @@ export default function CoachExamOverview() {
         }
 
         return (
-          <Card key={idx} className="p-6 gradient-card">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+          <Card key={idx} className="p-4 gradient-card hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between">
+              {/* Öğrenci ve Deneme Bilgisi */}
+              <div className="flex items-center gap-3 flex-1">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
                   {student ? student.ad[0] : '?'}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800">{upload.exam_name}</h3>
-                  <p className="text-sm text-gray-600 flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    {student ? `${student.ad} ${student.soyad || ''}`.trim() : 'Bilinmeyen Öğrenci'}
-                  </p>
-                  <p className="text-sm text-gray-600 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {new Date(upload.exam_date).toLocaleDateString('tr-TR')}
-                  </p>
+                  <h3 className="font-bold text-gray-800">{upload.exam_name}</h3>
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <span className="flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      {student ? `${student.ad} ${student.soyad || ''}`.trim() : 'Bilinmeyen'}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {new Date(upload.exam_date).toLocaleDateString('tr-TR')}
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              {/* Net Skoru */}
+              {analysis && (
+                <div className="text-center px-4">
+                  <p className="text-xs text-gray-600">Net</p>
+                  <p className="text-2xl font-bold text-green-600">{analysis.total_net}</p>
+                </div>
+              )}
+
+              {/* Durum Badge */}
               <div className="flex flex-col items-end gap-2">
-                {upload.file_type === 'manual' ? (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                    Manuel Giriş
+                {upload.analysis_status === 'pending' ? (
+                  <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-semibold">
+                    Analiz Bekliyor
+                  </span>
+                ) : upload.analysis_status === 'completed' ? (
+                  <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold">
+                    ✓ Tamamlandı
                   </span>
                 ) : (
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
-                    AI Analiz
+                  <span className="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold">
+                    Hata
                   </span>
                 )}
-                {upload.uploaded_by === 'coach' && (
-                  <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
-                    Koç Tarafından
+                {upload.file_type === 'manual' && (
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                    Manuel
                   </span>
                 )}
               </div>
+
+              {/* Detay Butonu */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openDetailModal(exam)}
+                className="ml-3"
+              >
+                <Eye className="w-4 h-4 mr-1" />
+                Detay
+              </Button>
             </div>
 
             {analysis && (
