@@ -303,6 +303,102 @@ export default function StudentsAnalysisTab() {
           ))}
         </div>
       </Card>
+
+      {/* Öğrenci Detay Modal */}
+      <Dialog open={detailModalOpen} onOpenChange={setDetailModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedStudentDetail?.student_name} - Detaylı Çalışma Raporu
+            </DialogTitle>
+          </DialogHeader>
+          
+          {studentDetailData ? (
+            <div className="space-y-6 mt-4">
+              {/* Soru Takip */}
+              <div>
+                <h4 className="text-lg font-bold text-gray-800 mb-3">Soru Çalışmaları</h4>
+                {studentDetailData.soruTakip.length > 0 ? (
+                  <div className="space-y-2">
+                    {studentDetailData.soruTakip.map((soru) => (
+                      <Card key={soru.id} className="p-4 bg-white">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-semibold text-gray-800">{soru.lesson}</p>
+                            <p className="text-sm text-gray-600">Konu: {soru.topic || 'Belirtilmemiş'}</p>
+                            <p className="text-xs text-gray-500">{new Date(soru.date).toLocaleDateString('tr-TR')}</p>
+                          </div>
+                          <div className="flex gap-6 text-center">
+                            <div>
+                              <p className="text-xs text-gray-600">Çözülen</p>
+                              <p className="text-lg font-bold text-indigo-600">{soru.solved}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Doğru</p>
+                              <p className="text-lg font-bold text-green-600">{soru.correct}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Yanlış</p>
+                              <p className="text-lg font-bold text-red-600">{soru.wrong}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Başarı</p>
+                              <p className="text-lg font-bold text-purple-600">
+                                %{((soru.correct / soru.solved) * 100).toFixed(1)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-4">Henüz soru çalışması yok</p>
+                )}
+              </div>
+
+              {/* Branş Tarama Testleri */}
+              <div>
+                <h4 className="text-lg font-bold text-gray-800 mb-3">Branş Tarama Testleri</h4>
+                {studentDetailData.bransTarama.length > 0 ? (
+                  <div className="space-y-2">
+                    {studentDetailData.bransTarama.map((brans) => (
+                      <Card key={brans.id} className="p-4 bg-gradient-to-r from-orange-50 to-red-50">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-semibold text-gray-800">{brans.lesson}</p>
+                            <p className="text-xs text-gray-500">{new Date(brans.date).toLocaleDateString('tr-TR')}</p>
+                          </div>
+                          <div className="flex gap-6 text-center">
+                            <div>
+                              <p className="text-xs text-gray-600">Toplam</p>
+                              <p className="text-lg font-bold text-indigo-600">{brans.total}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Net</p>
+                              <p className="text-lg font-bold text-green-600">{brans.net}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Başarı</p>
+                              <p className="text-lg font-bold text-purple-600">%{brans.accuracy}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-4">Henüz branş tarama testi yok</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Yükleniyor...</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
