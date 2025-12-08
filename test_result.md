@@ -558,11 +558,48 @@ backend:
         agent: "testing"
         comment: "✅ API endpoint /api/exam/student-exams/{student_id} çalışıyor. Yeni girilen deneme listede görünüyor: exam_name='Test Denemesi API', exam_date='2024-12-15', analysis_status='pending', total_net=51.25. Deneme kayıtları doğru şekilde saklanıyor ve listeleniyor."
 
+frontend:
+  - task: "Student Manual Exam Entry UI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/student/ExamManualEntry.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Manuel deneme girişi UI tamamen çalışıyor. Form alanları (TYT/AYT seçimi, deneme adı, tarih, ders bazlı doğru/yanlış/boş girişi) functional. Test senaryosu: 'Frontend Test Denemesi' TYT denemesi, Matematik (D=25, Y=10, B=5), Türkçe (D=30, Y=5, B=5) başarıyla kaydedildi. Success toast mesajı görüntülendi. Net hesaplama otomatik çalışıyor."
+        
+  - task: "Student Exam List Display"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/student/ExamAnalysisView.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Öğrenci deneme listesi görüntüleme çalışıyor. Yeni girilen deneme ('Frontend Test Denemesi') listede görünüyor. Manuel giriş badge'i, analiz durumu (pending), net skorları, ders bazlı breakdown doğru şekilde görüntüleniyor. Real-time güncelleme çalışıyor."
+        
+  - task: "Coach Notification System UI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/coach/CoachNotifications.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Koç bildirim sistemi UI tamamen çalışıyor. Bildirimler sekmesi erişilebilir, yeni deneme bildirimleri ('Yeni Deneme Girişi') görünüyor. Bildirim badge (2→1) dinamik güncelleniyor. Okundu işaretleme (✓ butonu) çalışıyor. Filtre sistemi (Tümü/Okunmamış) functional. Bildirim içeriği öğrenci adı ve deneme detaylarını içeriyor. Real-time bildirim delivery doğrulandı."
+
 test_plan:
   current_focus:
-    - "Manuel Deneme Girişi API"
-    - "Koç Bildirim Sistemi"
-    - "Öğrenci Deneme Listesi API"
+    - "Student Manual Exam Entry UI"
+    - "Student Exam List Display"
+    - "Coach Notification System UI"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
