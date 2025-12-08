@@ -222,10 +222,7 @@ export default function StudentPanel() {
           </TabsContent>
 
           <TabsContent value="topics">
-            <div className="space-y-6">
-              <TopicProgressManager studentId={student.id} />
-              <StudentTopicsView studentId={student.id} />
-            </div>
+            <StudentTopicsView studentId={student.id} />
           </TabsContent>
 
           <TabsContent value="exams">
