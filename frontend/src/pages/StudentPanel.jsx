@@ -188,8 +188,9 @@ export default function StudentPanel() {
 
         {/* Tabs */}
         <Tabs defaultValue="tasks" className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6">
+          <TabsList className="grid w-full grid-cols-8 mb-6">
             <TabsTrigger value="tasks" data-testid="student-tasks-tab">Görevlerim</TabsTrigger>
+            <TabsTrigger value="exam-analysis" data-testid="student-exam-analysis-tab">Deneme Analizi</TabsTrigger>
             <TabsTrigger value="analysis" data-testid="student-analysis-tab">Analizim</TabsTrigger>
             <TabsTrigger value="reports" data-testid="student-reports-tab">Raporlarım</TabsTrigger>
             <TabsTrigger value="topics" data-testid="student-topics-tab">Konular</TabsTrigger>
@@ -200,6 +201,13 @@ export default function StudentPanel() {
 
           <TabsContent value="tasks">
             <StudentTasksTab studentId={student.id} onRefresh={handleRefresh} />
+          </TabsContent>
+
+          <TabsContent value="exam-analysis">
+            <div className="space-y-6">
+              <ExamUploader studentId={student.id} onUploadComplete={handleRefresh} />
+              <ExamAnalysisView studentId={student.id} />
+            </div>
           </TabsContent>
 
           <TabsContent value="analysis">
