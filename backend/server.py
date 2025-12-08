@@ -670,6 +670,43 @@ async def create_soru_takip(data: SoruTakip):
     response = supabase.table("soru_takip").insert(record).execute()
     return response.data[0]
 
+# BRANŞ TARAMA TESTİ
+class BransTarama(BaseModel):
+    student_id: str
+    date: str
+    lesson: str
+    correct: int
+    wrong: int
+    blank: int
+    total: int
+
+@api_router.post("/student/brans-tarama")
+async def create_brans_tarama(data: BransTarama):
+    net = data.correct - (data.wrong / 4.0)
+    accuracy = (data.correct / data.total * 100) if data.total > 0 else 0
+    
+    record = {
+        "id": str(uuid.uuid4()),
+        "student_id": data.student_id,
+        "date": data.date,
+        "lesson": data.lesson,
+        "correct": data.correct,
+        "wrong": data.wrong,
+        "blank": data.blank,
+        "total": data.total,
+        "net": round(net, 2),
+        "accuracy": round(accuracy, 1),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    response = supabase.table("brans_tarama").insert(record).execute()
+    return response.data[0]
+
+@api_router.get("/student/{student_id}/brans-tarama")
+async def get_brans_tarama(student_id: str):
+    response = supabase.table("brans_tarama").select("*").eq("student_id", student_id).order("date", desc=True).execute()
+    return response.data
+
 # 3. KAYNAK TAKİBİ
 @api_router.get("/student/{student_id}/sources")
 async def get_student_sources(student_id: str):
