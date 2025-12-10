@@ -19,6 +19,8 @@ export default function StudentTasksTab({ studentId, onRefresh }) {
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDay, setSelectedDay] = useState('Pazartesi');
+  const [taskDetailModal, setTaskDetailModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [newTasks, setNewTasks] = useState([
     { aciklama: '', sure: 0 },
     { aciklama: '', sure: 0 },
@@ -31,6 +33,16 @@ export default function StudentTasksTab({ studentId, onRefresh }) {
     { aciklama: '', sure: 0 },
     { aciklama: '', sure: 0 },
   ]);
+
+  const truncateText = (text, maxChars = 40) => {
+    if (text.length <= maxChars) return text;
+    return text.substring(0, maxChars) + '...';
+  };
+
+  const openTaskDetail = (task) => {
+    setSelectedTask(task);
+    setTaskDetailModal(true);
+  };
 
   useEffect(() => {
     fetchTasks();
