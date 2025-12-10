@@ -102,13 +102,23 @@ export default function SoruTakip({ studentId }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold mb-2">Ders *</label>
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Ara... (örn: Fizik)"
+                className="mb-2"
+              />
               <select
                 value={formData.lesson}
-                onChange={(e) => setFormData({...formData, lesson: e.target.value})}
+                onChange={(e) => {
+                  setFormData({...formData, lesson: e.target.value});
+                  setSearchTerm('');
+                }}
                 className="w-full p-2 border rounded-lg"
+                size="5"
               >
                 <option value="">Seç</option>
-                {DERSLER.map(ders => (
+                {filteredDersler.map(ders => (
                   <option key={ders} value={ders}>{ders}</option>
                 ))}
               </select>
