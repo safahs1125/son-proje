@@ -104,13 +104,23 @@ export default function BransTaramaTesti({ studentId }) {
         <div className="space-y-4 mt-4">
           <div>
             <label className="block text-sm font-semibold mb-2">Ders Seçin</label>
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Ara... (örn: Fizik)"
+              className="mb-2"
+            />
             <select
               value={formData.lesson}
-              onChange={(e) => setFormData({ ...formData, lesson: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, lesson: e.target.value });
+                setSearchTerm('');
+              }}
               className="w-full p-2 border rounded-lg"
+              size="5"
             >
-              <option value="">Ders seçiniz...</option>
-              {BRANS_DERSLER.map((ders) => (
+              <option value="">Seç</option>
+              {filteredDersler.map((ders) => (
                 <option key={ders} value={ders}>
                   {ders}
                 </option>
