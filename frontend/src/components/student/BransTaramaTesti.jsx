@@ -28,12 +28,17 @@ const BRANS_DERSLER = [
 export default function BransTaramaTesti({ studentId }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     lesson: '',
     correct: '',
     wrong: '',
     blank: '',
   });
+
+  const filteredDersler = BRANS_DERSLER.filter(ders =>
+    ders.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleSubmit = async () => {
     if (!formData.lesson) {
