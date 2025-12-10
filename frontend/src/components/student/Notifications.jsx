@@ -40,6 +40,18 @@ export default function Notifications({ studentId }) {
     }
   };
 
+  const deleteNotification = async (notificationId, e) => {
+    e.stopPropagation();
+    try {
+      await axios.delete(`${BACKEND_URL}/api/notifications/${notificationId}`);
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      toast.success('Bildirim silindi');
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Silme başarısız');
+    }
+  };
+
   const getIcon = (type) => {
     switch (type) {
       case 'success':
