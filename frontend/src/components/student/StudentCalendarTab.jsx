@@ -181,16 +181,17 @@ export default function StudentCalendarTab({ studentId, onRefresh }) {
           <div className="space-y-3">
             {notes.map((note) => (
               <div key={note.id} className="p-4 bg-white rounded-lg shadow-sm flex justify-between items-start">
-                <div>
+                <div className="flex-1 mr-4">
                   <p className="text-sm text-gray-600 mb-1">
                     {new Date(note.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
-                  <p className="text-gray-800">{note.note}</p>
+                  <p className="text-gray-800 break-words">{note.note}</p>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => handleDeleteNote(note.id)}
+                  className="flex-shrink-0"
                 >
                   <Trash2 className="w-4 h-4 text-red-500" />
                 </Button>
