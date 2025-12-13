@@ -335,9 +335,9 @@ export default function StudentTasksTab({ studentId, onRefresh }) {
                         className="mt-1"
                         data-testid={`student-task-checkbox-${task.id}`}
                       />
-                      <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="flex-1 min-w-0">
                         <p 
-                          className={`text-sm break-words whitespace-normal overflow-wrap-anywhere cursor-pointer ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}
+                          className={`text-sm break-words cursor-pointer ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             openTaskDetail(task);
