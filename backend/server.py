@@ -27,11 +27,13 @@ api_router = APIRouter(prefix="/api")
 
 # Models
 class CoachLogin(BaseModel):
+    email: str
     password: str
 
 class CoachLoginResponse(BaseModel):
     success: bool
     token: Optional[str] = None
+    email: Optional[str] = None
 
 class StudentCreate(BaseModel):
     ad: str
