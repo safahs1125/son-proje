@@ -1,0 +1,14 @@
+node_modules
+.git
+.env
+.env.local
+*.log
+__pycache__
+*.pyc
+.pytest_cache
+.venv
+venv
+.emergent
+test_result.md
+tests/
+backend_test.py
