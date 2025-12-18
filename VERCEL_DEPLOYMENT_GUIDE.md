@@ -26,6 +26,7 @@ Vercel'e deploy etmeden önce, aşağıdaki environment variable'ları hazır bu
 SUPABASE_URL=https://blrlfmskgyfzjsvkgciu.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 COACH_EMAIL=safa_boyaci15@erdogan.edu.tr
+COACH_PASSWORD=coach2025
 COACH_PASSWORD_HASH=$2b$12$erzSRC6ZG12hEHmPzXkBXO...
 EMERGENT_LLM_KEY=sk-emergent-081991cF1Bf0c8a0d1
 REACT_APP_BACKEND_URL=https://your-project.vercel.app
